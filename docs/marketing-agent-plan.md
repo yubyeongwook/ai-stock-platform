@@ -71,6 +71,8 @@ AM/QA/총괄 검수를 별도로 채용하지 않고, 8개 에이전트가 만�
 
 각 에이전트의 필요 구성(인풋·도구·아웃풋)과 단계별 업무 프로세스는 [`docs/agent-specs.md`](./agent-specs.md) 참고.
 
+내(사람)가 Phase 0을 시작하기 위해 지금 해야 할 일과 필요한 계정·도구는 [`docs/operator-checklist.md`](./operator-checklist.md) 참고.
+
 ## 7. 참고 구현
 
 - `blog_content_agent.py`: 업종 무관 SEO 블로그 초안 생성기 (블로그 라인)
