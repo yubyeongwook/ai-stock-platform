@@ -29,6 +29,6 @@
 
 ## 참고
 
-- 파일럿 기간(4주) 무료 진행 시 이 견적은 파일럿 종료 후 정식 계약 전환용
+- 사업자등록 완료 전까지는 무료로 진행 — 이 견적은 사업자등록 완료 후 정식 계약 전환 시점에 사용
 - 정식 계약 시 [`docs/service-agreement-template.md`](./service-agreement-template.md) 사용, 변호사 검토 필수
 - 가격 산정 근거는 [`docs/revenue-model.md`](./revenue-model.md) 참고 — 실제 파일럿 결과로 조정 가능
