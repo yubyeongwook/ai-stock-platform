@@ -1,0 +1,8 @@
+pandas
+yfinance
+feedparser
+openpyxl
+requests
+python-dotenv
+google-analytics-data
+anthropic

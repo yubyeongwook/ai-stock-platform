@@ -1,0 +1,38 @@
+name: Generate Marketing Content
+
+# 수동 실행만 허용한다 — 실제 LLM API 호출은 비용이 발생하므로,
+# 자동 스케줄(예: 매일 자정)은 파일럿이 검증된 뒤 별도로 추가한다.
+on:
+  workflow_dispatch:
+    inputs:
+      client_file:
+        description: "clients/ 안의 브리프 파일명 (예: seocho-kimchi-jjigae.json)"
+        required: true
+        default: "seocho-kimchi-jjigae.json"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - run: python orchestrator.py "clients/${{ inputs.client_file }}"
+        env:
+          # 시크릿 이름이 .env.example과 동일해야 인식된다. Repo Settings > Secrets and
+          # variables > Actions 에서 이름을 확인·등록할 것. 값이 비어 있거나 이름이
+          # 틀려도 워크플로는 죽지 않고 "미설정"으로 로그에 남긴다(orchestrator.py의
+          # graceful degradation 그대로 적용됨).
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ALIMTALK_API_BASE_URL: ${{ secrets.ALIMTALK_API_BASE_URL }}
+          ALIMTALK_API_KEY: ${{ secrets.ALIMTALK_API_KEY }}
+          ALIMTALK_USER_ID: ${{ secrets.ALIMTALK_USER_ID }}
+          ALIMTALK_SENDER_KEY: ${{ secrets.ALIMTALK_SENDER_KEY }}
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          META_AD_ACCOUNT_ID: ${{ secrets.META_AD_ACCOUNT_ID }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: outbox-${{ inputs.client_file }}
+          path: outbox/

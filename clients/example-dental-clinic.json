@@ -1,0 +1,16 @@
+{
+  "slug": "example-dental-clinic",
+  "business_name": "예시치과",
+  "category": "치과",
+  "location": "강남",
+  "keywords": ["임플란트 비용", "충치 치료"],
+  "review_target_phone": "010-0000-0000",
+  "ga4_property_id": null,
+  "banned_terms": [
+    "100% 완치",
+    "무통증 시술",
+    "안전성 보장",
+    "타 병원보다 우수",
+    "환자 치료 후기"
+  ]
+}
