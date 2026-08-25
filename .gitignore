@@ -3,4 +3,3 @@ __pycache__/
 outbox/
 .env
 status.html
-performance_log.jsonl
