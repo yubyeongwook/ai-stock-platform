@@ -2,3 +2,5 @@ __pycache__/
 *.pyc
 outbox/
 .env
+status.html
+performance_log.jsonl

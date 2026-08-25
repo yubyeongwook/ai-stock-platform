@@ -130,7 +130,12 @@ AM/QA/총괄 검수를 별도로 채용하지 않고, 9개 에이전트가 만�
 - `marketing_content_agent.py`: 금융/증권 버티컬용 일일 브리핑 콘텐츠 생성기 (v1에서 이어지는 특정 버티컬 예시)
 - `orchestrator.py`: 고객사 브리프(`clients/*.json`)를 받아 블로그·플레이스 초안을 생성하고, 카카오 알림톡·메타·GA4 연동을 설정된 만큼만 시도하는 실행 스켈레톤. 크리덴셜 없이도 콘텐츠 뼈대 생성 부분은 바로 동작한다
 - `business_dna.py` / `master_ai.py`: north-star-vision.md의 Business DNA·Master AI 개념을 미리 만든 최소(규칙 기반) 버전 — 업종 자동 프로필링, 치과 등 보류 버티컬 코드 레벨 차단, 퍼널 병목 진단. 자세한 한계는 `docs/north-star-vision.md` 9절 참고
-- `tests/`: 45개 테스트로 전체 파이프라인 검증(`pip install -r requirements-dev.txt && pytest`). 이 테스트를 짜다가 실제 버그 하나를 잡았다 — `ga4_client.py`가 패키지 미설치 시 `GA4ConfigError` 대신 `ModuleNotFoundError`를 새어나가게 해서 `orchestrator.py`가 죽을 수 있었음(수정·회귀테스트 완료)
+- `tests/`: 53개 테스트로 전체 파이프라인 검증(`pip install -r requirements-dev.txt && pytest`). 이 테스트를 짜다가 실제 버그 하나를 잡았다 — `ga4_client.py`가 패키지 미설치 시 `GA4ConfigError` 대신 `ModuleNotFoundError`를 새어나가게 해서 `orchestrator.py`가 죽을 수 있었음(수정·회귀테스트 완료)
+- `performance_log.py`: **3단계(업종 플레이북 자산화) 재료를 받는 그릇** — 실제 성과가 최소 3건 쌓이면 `master_ai.py`의 가정 벤치마크를 실측치로 교체하자고 제안한다. 지금은 데이터 0건, 로직만 준비됨
+- `status_dashboard.py`: **4단계(미니 대시보드)의 지금 버전** — Vercel+Supabase 없이 `clients/*.json`+`outbox/`만 읽어 정적 HTML 상태판을 로컬 생성한다(`python status_dashboard.py` → `status.html`). 진짜 웹 대시보드는 여전히 6절의 트리거(고객 6곳+) 이후
+- `docs/saas-db-schema-draft.sql`: **5단계(SaaS 전환) 스키마 설계 초안** — 실제 Supabase 프로젝트는 아직 프로비저닝 안 함, 착수 시점에 그대로 적용할 수 있게 설계만 해둠
+- `business_dna.py`의 6단계 대비 프로필: 병원 일반·미용실·학원·법무법인/세무법인을 미리 등록해뒀으나 전부 `active: False` — 법 조문 검증 전에는 콘텐츠 생성 자체가 코드로 막힘
+- `docs/quote-template.md`: 2단계(첫 유료 전환) 견적서 템플릿, `service-agreement-template.md`와 짝
 - `.github/workflows/ci.yml`: 푸시할 때마다 테스트 45개 자동 실행
 - `.github/workflows/generate-content.yml`: GitHub Actions 시크릿(`ANTHROPIC_API_KEY` 등, 이름은 `.env.example`과 동일해야 함)으로 `orchestrator.py`를 실제 실행 — 지금은 수동 실행만(비용 발생 가능해서 자동 스케줄은 파일럿 검증 후 추가). 산출물은 워크플로 아티팩트로 다운로드
 - `integrations/`: 카카오 알림톡·메타 광고·GA4·LLM(클로드) 연동 클라이언트. `.env.example` 참고. 카카오·메타·GA4는 계정 발급(본인 명의·사업자 인증 필요, 내가 대신 못 함)이 남아있고, **LLM(`llm_writer.py`)은 `ANTHROPIC_API_KEY`만 넣으면 바로 실제 블로그 본문을 써준다** — API 키 미설정/오류 시에도 죽지 않고 뼈대만 출력하며 이유를 파일에 남긴다(검증 완료)

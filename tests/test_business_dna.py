@@ -15,7 +15,20 @@ def test_classify_dental():
 
 
 def test_classify_unknown_falls_back_to_generic():
-    assert classify_business("입시학원") == "generic"
+    assert classify_business("애견호텔") == "generic"
+
+
+def test_stage6_prep_verticals_classify_correctly_but_stay_inactive():
+    # 6단계(업종 확장) 대비 미리 등록한 프로필들 — 전부 아직 비활성이어야 한다
+    for category, expected_vertical in [
+        ("정형외과", "medical_general"),
+        ("미용실", "beauty"),
+        ("입시학원", "academy"),
+        ("법무법인", "legal_tax"),
+    ]:
+        assert classify_business(category) == expected_vertical
+        dna = build_business_dna("업체", category)
+        assert dna["vertical_active"] is False, f"{expected_vertical}은 아직 활성화하면 안 됨"
 
 
 def test_dental_is_inactive_by_default():

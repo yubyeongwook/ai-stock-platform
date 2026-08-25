@@ -35,6 +35,40 @@ VERTICAL_PROFILES = {
         "compliance_note": "의료법 의료광고 규제 — 조문 미검증. Phase 3까지 의도적으로 비활성",
         "active": False,
     },
+    # 아래는 6단계(업종 확장) 대비 사전 등록. 전부 active=False — 법 조문 미검증 상태로
+    # 실제 콘텐츠를 만들면 안 되기 때문에, 착수 시점에 검증부터 하고 active=True로 바꾼다.
+    "medical_general": {
+        "match_keywords": ["병원", "한의원", "피부과", "성형외과", "내과", "정형외과"],
+        "banned_terms": ["100% 완치", "무통증 시술", "안전성 보장", "타 병원보다 우수", "환자 치료 후기"],
+        "performance_pricing_allowed": False,
+        "default_customer_stage": "decision",
+        "compliance_note": "의료법 의료광고 규제 — 조문 미검증. 착수 전 검증 필수",
+        "active": False,
+    },
+    "beauty": {
+        "match_keywords": ["미용실", "헤어샵", "네일샵", "피부관리실"],
+        "banned_terms": [],
+        "performance_pricing_allowed": True,
+        "default_customer_stage": "comparison",
+        "compliance_note": "특이 규제 없음 — 표시광고법 기본만 확인",
+        "active": False,
+    },
+    "academy": {
+        "match_keywords": ["학원", "과외", "교습소"],
+        "banned_terms": ["100% 합격", "성적 보장"],
+        "performance_pricing_allowed": True,
+        "default_customer_stage": "comparison",
+        "compliance_note": "학원법상 허위·과장 광고 제한 — 조문 미검증. 착수 전 검증 필수",
+        "active": False,
+    },
+    "legal_tax": {
+        "match_keywords": ["변호사", "법무법인", "세무사", "회계법인"],
+        "banned_terms": ["고객 연결해드립니다", "상담하시면 소개", "성사 시 정산", "승소 보장"],
+        "performance_pricing_allowed": False,
+        "default_customer_stage": "awareness",
+        "compliance_note": "변호사법·세무사법상 사건 소개·알선 제한 소지 — 노무법인과 유사한 구조로 추정되나 조문 미검증. 착수 전 검증 필수",
+        "active": False,
+    },
 }
 
 
