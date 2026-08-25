@@ -31,9 +31,23 @@ def _load_client():
     return anthropic.Anthropic(api_key=api_key)
 
 
-def _build_prompt(draft: dict, business_name: str, category: str, location: str | None, banned_terms: list[str]) -> str:
+def _build_prompt(
+    draft: dict,
+    business_name: str,
+    category: str,
+    location: str | None,
+    banned_terms: list[str],
+    known_facts: list[str],
+) -> str:
     banned_line = (
         f"다음 표현은 절대 쓰지 마라(광고 규제 위반 소지): {', '.join(banned_terms)}\n" if banned_terms else ""
+    )
+    facts_block = (
+        "아래는 실제로 확인된 사실이다 — 이것만 구체적 근거로 써도 된다:\n"
+        + "\n".join(f"- {fact}" for fact in known_facts)
+        + "\n"
+        if known_facts
+        else ""
     )
 
     outline_text = "\n".join(draft["outline"])
@@ -53,6 +67,11 @@ SEO 블로그 포스트 본문을 한국어로 작성해라. 아래 원칙을 �
 
 타겟 키워드: {", ".join(draft["keywords"])}
 
+{facts_block}
+**절대 규칙 — 사실 지어내기 금지**: 이 업체의 구체적인 운영 방식·재료·조리법·정책(숙성 기간, 육수 우려내는 주기, 예약 가능 여부 등)은
+위 "확인된 사실"에 없으면 지어내지 마라. 구체적 디테일이 필요한 문장은 업종 일반론(예: "김치찌개는 묵은지 숙성도에 따라 맛이 갈린다")으로
+쓰고, "이 업체가 어떻게 한다"처럼 이 업체만의 확인 안 된 사실을 단정적으로 쓰지 마라.
+
 요구사항:
 - 목차의 각 항목을 소제목(##)으로 삼아 2~4문단씩 채운다
 - 위 [전환 심리학 원칙]을 본문과 CTA 직전 문단에 실제로 반영한다 — 원칙 이름을 나열하지 말고 문장에 자연스럽게 녹인다
@@ -71,12 +90,13 @@ def write_full_blog_post(
     category: str,
     location: str | None = None,
     banned_terms: list[str] | None = None,
+    known_facts: list[str] | None = None,
     model: str = "claude-sonnet-5",
 ) -> str:
     """뼈대(draft)를 받아 실제 블로그 본문 텍스트를 생성해 반환한다."""
 
     client = _load_client()
-    prompt = _build_prompt(draft, business_name, category, location, banned_terms or [])
+    prompt = _build_prompt(draft, business_name, category, location, banned_terms or [], known_facts or [])
 
     response = client.messages.create(
         model=model,

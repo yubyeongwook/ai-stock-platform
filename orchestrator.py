@@ -84,6 +84,7 @@ def write_blog_body(blog_draft: dict, client: dict) -> dict:
             category=client["category"],
             location=client.get("location"),
             banned_terms=client.get("banned_terms"),
+            known_facts=client.get("known_facts"),
         )
         return {"status": "generated", "text": text}
     except LLMWriterConfigError as e:

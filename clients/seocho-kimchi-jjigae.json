@@ -5,5 +5,10 @@
   "location": "서초",
   "keywords": ["서초 김치찌개", "강남 서초 맛집"],
   "review_target_phone": null,
-  "ga4_property_id": null
+  "ga4_property_id": null,
+  "banned_terms": [
+    "묵은지를 자체적으로 숙성",
+    "국물 베이스를 매일 오전 새로 우려내는",
+    "예약 문의를 받는 경우도 있어"
+  ]
 }
