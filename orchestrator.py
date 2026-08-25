@@ -1,7 +1,9 @@
 """오케스트레이터 — 고객사 브리프 하나를 받아 라인 에이전트들을 돌리고 결과를 outbox에 쌓는다.
 
 지금 실제로 자동인 것과 아닌 것을 그대로 반영한다:
-- 콘텐츠 생성(블로그·플레이스 초안)은 100% 자동 — 크리덴셜 없이도 바로 돈다
+- 콘텐츠 뼈대(제목·목차·CTA, 플레이스 체크리스트)는 100% 자동 — 크리덴셜 없이도 바로 돈다
+- 블로그 본문은 ANTHROPIC_API_KEY가 있으면 실제 LLM이 채운다(레벨 2: AI 생성 + 사람 승인).
+  없으면 뼈대만 출력하고 그렇게 명시한다 — 조용히 얼버무리지 않는다
 - 카카오 알림톡·메타 광고·GA4 조회는 관련 환경변수(.env, .env.example 참고)가 없으면
   "설정 안 됨"을 그대로 알려주고 건너뛴다 — 계정을 발급받아 값을 채우면 그 즉시 동작한다
 - 네이버 블로그 발행·스마트플레이스 수정은 공식 API가 없어 여기서 다루지 않는다.
@@ -35,7 +37,13 @@ def generate_daily_outputs(client: dict, out_dir: str = "outbox") -> dict:
         location=client.get("location"),
     )
     blog_path = client_dir / "blog_draft.md"
-    blog_path.write_text(render_blog_markdown(blog_draft), encoding="utf-8")
+
+    blog_body = write_blog_body(blog_draft, client)
+    if blog_body["status"] == "generated":
+        content = f"# {blog_draft['title_candidates'][0]}\n\n{blog_body['text']}"
+    else:
+        content = render_blog_markdown(blog_draft) + f"\n\n> ⚠️ {blog_body['status']}"
+    blog_path.write_text(content, encoding="utf-8")
 
     place_plan = build_local_marketing_plan(
         business_name=client["business_name"],
@@ -49,6 +57,26 @@ def generate_daily_outputs(client: dict, out_dir: str = "outbox") -> dict:
     )
 
     return {"blog_draft": str(blog_path), "place_plan": str(place_path)}
+
+
+def write_blog_body(blog_draft: dict, client: dict) -> dict:
+    """가능하면 LLM으로 실제 본문을 채운다. 안 되면 이유를 그대로 보고한다."""
+
+    from integrations.llm_writer import LLMWriterConfigError, write_full_blog_post
+
+    try:
+        text = write_full_blog_post(
+            blog_draft,
+            business_name=client["business_name"],
+            category=client["category"],
+            location=client.get("location"),
+            banned_terms=client.get("banned_terms"),
+        )
+        return {"status": "generated", "text": text}
+    except LLMWriterConfigError as e:
+        return {"status": f"LLM 미설정: {e}"}
+    except Exception as e:  # noqa: BLE001 — API 키 오류·네트워크 오류 등, 뼈대 출력으로 계속 진행
+        return {"status": f"LLM 호출 실패: {e}"}
 
 
 def send_review_reminder(client: dict, dry_run: bool = True) -> dict:
