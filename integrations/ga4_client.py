@@ -31,13 +31,14 @@ def _load_client():
 def get_weekly_summary(property_id: str | None = None) -> dict:
     """최근 7일 세션·전환 이벤트 요약 — 성과 분석 에이전트가 매주 호출하는 함수."""
 
-    from google.analytics.data_v1beta.types import DateRange, Dimension, Metric, RunReportRequest
-
     property_id = property_id or os.environ.get("GA4_PROPERTY_ID")
     if not property_id:
         raise GA4ConfigError("GA4_PROPERTY_ID가 설정되지 않았습니다.")
 
-    client = _load_client()
+    client = _load_client()  # 패키지 미설치·크리덴셜 미설정을 여기서 먼저 GA4ConfigError로 잡는다
+
+    from google.analytics.data_v1beta.types import DateRange, Dimension, Metric, RunReportRequest
+
     request = RunReportRequest(
         property=f"properties/{property_id}",
         dimensions=[Dimension(name="date")],
