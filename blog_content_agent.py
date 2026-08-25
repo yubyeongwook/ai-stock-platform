@@ -3,21 +3,30 @@
 고객사(업종, 상호명, 타겟 키워드)를 입력받아 블로그 포스트 초안의
 구조(제목 후보, 목차, 본문 뼈대, CTA)를 생성한다.
 LLM 없이 규칙 기반 템플릿으로 동작해 별도 API 키 없이 바로 실행 가능하다.
-실제 서비스에서는 이 뼈대를 LLM에 넘겨 본문을 완성시키는 식으로 확장한다.
+제목은 밋밋한 조합이 아니라 content_playbook.py의 검증된 헤드라인 공식(4U 원칙)을 쓴다.
+실제 서비스에서는 이 뼈대를 LLM(integrations/llm_writer.py)에 넘겨 본문을 완성시킨다.
 """
 
+from content_playbook import HEADLINE_FORMULAS, render_headline
 
-def build_blog_draft(business_name: str, category: str, keywords: list[str], location: str | None = None) -> dict:
+
+def build_blog_draft(
+    business_name: str,
+    category: str,
+    keywords: list[str],
+    location: str | None = None,
+    customer_stage: str = "awareness",
+) -> dict:
     if not keywords:
         raise ValueError("keywords는 최소 1개 이상이어야 합니다.")
 
     primary_keyword = keywords[0]
     location_prefix = f"{location} " if location else ""
 
+    # HEADLINE_FORMULAS의 4개 공식(초구체적/숫자기반/질문형/비교형)을 그대로 채워
+    # 성격이 다른 제목 후보를 만든다 — 전부 같은 패턴으로 밋밋하게 나오지 않도록 다양성을 확보
     title_candidates = [
-        f"{location_prefix}{category} {primary_keyword} 완벽 가이드 | {business_name}",
-        f"{primary_keyword}, {business_name}에서 확인하세요",
-        f"{location_prefix}{category} 찾으신다면 - {primary_keyword} 총정리",
+        render_headline(formula, primary_keyword, category, location, number=3) for formula in HEADLINE_FORMULAS
     ]
 
     outline = [
@@ -35,6 +44,7 @@ def build_blog_draft(business_name: str, category: str, keywords: list[str], loc
         "outline": outline,
         "keywords": keywords,
         "cta": cta,
+        "customer_stage": customer_stage,
     }
 
 

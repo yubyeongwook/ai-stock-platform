@@ -122,7 +122,8 @@ AM/QA/총괄 검수를 별도로 채용하지 않고, 9개 에이전트가 만�
 
 ## 8. 참고 구현
 
-- `blog_content_agent.py`: 업종 무관 SEO 블로그 초안 생성기 (블로그 라인)
+- `content_playbook.py`: **코어 엔진의 실질적 해자** — 4U 헤드라인 공식, 네이버 SEO 구조 원칙, 전환심리학 원칙을 코드 자산으로 담은 노하우 라이브러리. `blog_content_agent.py`·`integrations/llm_writer.py`가 참조한다 (`docs/competitive-moat.md` 3절)
+- `blog_content_agent.py`: 업종 무관 SEO 블로그 초안 생성기 (블로그 라인), 제목은 `content_playbook.py`의 헤드라인 공식으로 생성
 - `local_place_agent.py`: 로컬/플레이스 마케팅 체크리스트·문구 생성기 (플레이스 라인)
 - `marketing_content_agent.py`: 금융/증권 버티컬용 일일 브리핑 콘텐츠 생성기 (v1에서 이어지는 특정 버티컬 예시)
 - `orchestrator.py`: 고객사 브리프(`clients/*.json`)를 받아 블로그·플레이스 초안을 생성하고, 카카오 알림톡·메타·GA4 연동을 설정된 만큼만 시도하는 실행 스켈레톤. 크리덴셜 없이도 콘텐츠 뼈대 생성 부분은 바로 동작한다

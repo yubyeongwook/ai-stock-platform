@@ -1,13 +1,17 @@
 """LLM(클로드) 연결 — blog_content_agent가 만든 뼈대(제목/목차/CTA)를 실제 본문으로 채운다.
 
 blog_content_agent.build_blog_draft()는 규칙 기반 뼈대만 만든다(제목 후보, 목차, CTA).
-이 모듈이 그 뼈대를 받아 실제 SEO 블로그 본문 문장을 생성한다.
+이 모듈이 그 뼈대를 받아 실제 SEO 블로그 본문 문장을 생성하되, content_playbook.py의
+검증된 카피라이팅·전환심리학·네이버 SEO 원칙을 프롬프트에 명시적으로 지시한다 —
+그냥 "글 써줘"가 아니라 실제 노하우가 든 지시를 넣는 게 이 모듈의 핵심.
 
 사전 준비물: ANTHROPIC_API_KEY (.env.example 참고)
 의존성: pip install anthropic (requirements.txt에 포함)
 """
 
 import os
+
+from content_playbook import build_playbook_instructions
 
 
 class LLMWriterConfigError(RuntimeError):
@@ -33,9 +37,14 @@ def _build_prompt(draft: dict, business_name: str, category: str, location: str 
     )
 
     outline_text = "\n".join(draft["outline"])
+    playbook = build_playbook_instructions(draft.get("customer_stage", "awareness"))
 
-    return f"""아래 뼈대를 바탕으로 {location or ''} {category} 업체 "{business_name}"를 위한
-SEO 블로그 포스트 본문을 한국어로 작성해라.
+    return f"""너는 이 업종에서 20년 경력의 카피라이터 겸 로컬 SEO 전문가다.
+아래 뼈대를 바탕으로 {location or ''} {category} 업체 "{business_name}"를 위한
+SEO 블로그 포스트 본문을 한국어로 작성해라. 아래 원칙을 실제로 적용해서 써라 —
+일반적인 정보성 블로그처럼 밋밋하게 쓰지 마라.
+
+{playbook}
 
 제목: {draft["title_candidates"][0]}
 
@@ -46,6 +55,8 @@ SEO 블로그 포스트 본문을 한국어로 작성해라.
 
 요구사항:
 - 목차의 각 항목을 소제목(##)으로 삼아 2~4문단씩 채운다
+- 위 [전환 심리학 원칙]을 본문과 CTA 직전 문단에 실제로 반영한다 — 원칙 이름을 나열하지 말고 문장에 자연스럽게 녹인다
+- 위 [네이버 SEO 구조 원칙]을 문서 구조에 반영한다 (특히 첫 문단은 반드시 핵심 키워드+답을 압축 제시)
 - 정보 전달 위주로 쓰고, 과장·단정적 효과 표현은 피한다
 - 타겟 키워드를 자연스럽게 본문에 녹인다(키워드 스터핑 금지)
 - 마지막에 CTA 문장으로 마무리: "{draft["cta"]}"
