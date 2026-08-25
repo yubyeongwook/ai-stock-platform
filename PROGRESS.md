@@ -45,6 +45,11 @@
 - **주식 블로그 커스텀 도메인 연결** — 가비아에 `blog` CNAME(`ghs.google.com.`) 등록 완료, Blogger 맞춤 도메인 `blog.aistoag.com`으로 설정 + 도메인 리디렉션 켬. **실제로 접속되는 것 확인 완료**(정상 콘텐츠 로드), 다만 HTTPS 인증서는 아직 발급 중("주의 요함" 경고 뜸) — 완료되면 코드 쪽(`utils/search_console_sync.py` 등) 도메인 주소 갱신 필요
   - **⛔ 막힘**: 네이버 서치어드바이저 소유확인(HTML 태그 방식)을 위해 Blogger 테마 HTML에 메타태그 삽입 시도 → **Blogger 자체 버그로 저장 실패**("AdSense1 위젯이 유효하지 않음" 내부 오류가 테마 저장을 막음). 위젯 삭제도 같은 에러로 실패. Blogger API는 테마/위젯 편집 기능 자체가 없어 코드로 우회 불가 — 사장님이 직접 웹 화면에서 나중에(다른 기기·시간에) 재시도 필요
   - 내일 자동화 자체는 문제없음 확인 완료 — Blogger 발행 API는 BLOG_ID 기반이라 도메인/테마 상태와 무관하게 정상 작동
+  - **구글 서치콘솔에서 `aistoag.com`은 이미 도메인 전체(sc-domain:) 속성으로 확인돼 있었음** — `blog.aistoag.com`도 그 하위 도메인이라 별도 인증 없이 자동 포함될 가능성 높음. `aigoid.blogspot.com`은 도메인 이전하면서 "확인 안됨"으로 넘어감(리디렉션 켜놨으니 문제 없음)
+  - **`aistoag.com`(웹, aigoid-insight-web) 서치콘솔 색인 현황도 확인**: 12개 중 5개 색인/7개 미색인이지만, 미색인 사유(로그인필요 페이지, 중복 로그인URL, 리디렉션)가 다 정상적인 것들이라 문제 없음 — 재요청 불필요
+  - **도메인 참조 코드 업데이트 완료**(`update-custom-domain-refs` 브랜치, 아직 미머지): About/면책 페이지 링크, 사이트맵 핑 기본값, search_console_collector.py, 발행 URL 폴백 2곳 → 전부 `blog.aistoag.com`으로
+  - **서치콘솔 서비스 계정 재사용 가능 발견**: `collectors/search_console_collector.py`에 이미 서비스 계정(`search-console-reader@aigoid-blog-automation-500804.iam.gserviceaccount.com`)이 블로그+aistoag.com 양쪽에 "전체" 권한으로 등록돼 있음. `search_console_sync.py`(add-search-console-sync 브랜치)를 이 계정과 같은 시크릿 이름(`GOOGLE_SEARCH_CONSOLE_CREDENTIALS_JSON`)을 쓰도록 맞춤 — **GitHub Secrets에 이미 등록돼 있으면 새 서비스 계정 안 만들어도 됨**, 없으면 새로 등록
+  - **노무체크AI 리디렉션 무한루프 버그 발견+수정**: `laborcheckai.co.kr`(Vercel) 서치콘솔에서 142개 페이지 "리디렉션 실패" 확인 → `vercel.json`의 `/(.*) → 노무체크ai.com` 리디렉션에 호스트 조건이 없어서, `노무체크ai.com` 자신도 이 규칙에 걸려 자기 자신으로 리디렉션(무한루프)되고 있었음(사장님이 직접 `노무체크ai.com` 접속 시 주소창이 `laborcheck-ai.vercel.app`로 바뀌는 것으로 확인). `laborcheck-ai` 저장소 `fix-vercel-redirect-loop` 브랜치에 호스트 조건(`has: host`) 추가해서 수정, 푸시 완료(미머지)
 - **서초김치찌개 브리프** — 상호명·지역·업종 확정, 전화번호·정확한 키워드는 미확정
 - **API 키 정식 등록** — 테스트용 키로 1회 작동 확인만 됨, GitHub Secrets 정식 등록 전
 - **서초김치찌개 사례 만들기(루프1 재료)** — 목표: 한 달 안에 신규고객 증가를 사례로 만들어 다음 유료고객 세일즈에 쓴다. 베이스라인 기록 시작(`performance_log.jsonl`):
