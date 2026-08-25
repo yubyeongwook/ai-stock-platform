@@ -17,6 +17,7 @@ from datetime import datetime
 from pathlib import Path
 
 from blog_content_agent import build_blog_draft, render_markdown as render_blog_markdown
+from business_dna import build_business_dna
 from local_place_agent import build_local_marketing_plan, render_markdown as render_place_markdown
 
 
@@ -26,6 +27,16 @@ def load_client(path: str) -> dict:
 
 
 def generate_daily_outputs(client: dict, out_dir: str = "outbox") -> dict:
+    dna = build_business_dna(client["business_name"], client["category"], client.get("banned_terms"))
+
+    if not dna["vertical_active"] and not client.get("override_vertical_hold"):
+        return {
+            "blocked": (
+                f"'{dna['vertical']}' 버티컬은 의도적으로 보류 중입니다 ({dna['compliance_note']}). "
+                "정말 진행하려면 client json에 \"override_vertical_hold\": true를 명시적으로 추가하세요."
+            )
+        }
+
     today = datetime.now().strftime("%Y-%m-%d")
     client_dir = Path(out_dir) / client["slug"] / today
     client_dir.mkdir(parents=True, exist_ok=True)
@@ -35,10 +46,12 @@ def generate_daily_outputs(client: dict, out_dir: str = "outbox") -> dict:
         category=client["category"],
         keywords=client["keywords"],
         location=client.get("location"),
+        customer_stage=client.get("customer_stage", dna["default_customer_stage"]),
     )
     blog_path = client_dir / "blog_draft.md"
 
-    blog_body = write_blog_body(blog_draft, client)
+    client_with_dna = {**client, "banned_terms": dna["banned_terms"]}
+    blog_body = write_blog_body(blog_draft, client_with_dna)
     if blog_body["status"] == "generated":
         content = f"# {blog_draft['title_candidates'][0]}\n\n{blog_body['text']}"
     else:
@@ -126,15 +139,28 @@ def fetch_weekly_performance(client: dict) -> dict:
     return result
 
 
+def diagnose_client_priority(client: dict, metrics: dict) -> dict:
+    """Master AI(master_ai.py)에게 이번 주기 우선순위를 물어본다. 실행은 안 하고 추천만 반환한다."""
+
+    from master_ai import next_cycle_priority
+
+    return next_cycle_priority(client["business_name"], metrics)
+
+
 def main():
     parser = argparse.ArgumentParser(description="고객사 브리프 기반 일일 산출물 생성")
     parser.add_argument("client_json", help="clients/example-hospital.json 같은 브리프 파일 경로")
     parser.add_argument("--out", default="outbox", help="산출물 저장 경로")
+    parser.add_argument("--metrics-json", help="성과 지표 JSON 파일 경로 — 있으면 Master AI 병목 진단도 함께 실행")
     args = parser.parse_args()
 
     client = load_client(args.client_json)
 
     outputs = generate_daily_outputs(client, args.out)
+    if "blocked" in outputs:
+        print(f"차단됨: {outputs['blocked']}")
+        return
+
     print("생성 완료:")
     for name, path in outputs.items():
         print(f"  - {name}: {path}")
@@ -144,6 +170,12 @@ def main():
 
     perf = fetch_weekly_performance(client)
     print(f"주간 성과: {perf}")
+
+    if args.metrics_json:
+        with open(args.metrics_json, encoding="utf-8") as f:
+            metrics = json.load(f)
+        diagnosis = diagnose_client_priority(client, metrics)
+        print(f"Master AI 진단: {diagnosis}")
 
 
 if __name__ == "__main__":
