@@ -1,0 +1,9 @@
+{
+  "slug": "example-restaurant",
+  "business_name": "예시식당",
+  "category": "고깃집",
+  "location": "강남",
+  "keywords": ["강남 회식", "강남 고깃집 추천"],
+  "review_target_phone": "010-0000-0000",
+  "ga4_property_id": null
+}
