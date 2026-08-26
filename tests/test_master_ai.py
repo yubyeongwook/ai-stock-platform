@@ -1,4 +1,4 @@
-from master_ai import diagnose_bottleneck, next_cycle_priority
+from master_ai import diagnose_bottleneck, next_cycle_priority, propose_next_action
 
 
 def test_no_metrics_returns_no_bottleneck():
@@ -23,3 +23,16 @@ def test_ignores_unmeasured_stages():
 def test_next_cycle_priority_never_auto_executes():
     result = next_cycle_priority("업체", {"impressions": 100})
     assert "승인" in result["status"]
+
+
+def test_propose_next_action_matches_bottleneck_stage():
+    metrics = {"impressions": 1000, "ctr": 0.03, "conversion_rate": 0.03}
+    result = propose_next_action("업체", metrics)
+    assert result["diagnosis"]["bottleneck"] == "전환율"
+    assert len(result["candidate_actions"]) > 0
+    assert "승인" in result["status"]
+
+
+def test_propose_next_action_empty_when_no_bottleneck():
+    result = propose_next_action("업체", {})
+    assert result["candidate_actions"] == []
