@@ -72,6 +72,165 @@ ADSENSE_CHECKLIST = [
 ]
 
 
+## ────────────────────────────────────────────────────────────────
+## 실제 HTTP 진단 — 이 저장소가 실행되는 환경(예: 이 저장소 자체 GitHub Actions,
+## 또는 aigoid-blog-bot·laborcheck-ai의 GitHub Actions)처럼 실제 인터넷 접근이
+## 되는 곳에서 실행하면, 매뉴얼로 True/False를 채워 넣을 필요 없이 실제 사이트를
+## 직접 확인한다. (참고: 이 매출엔진 세션 자체는 보안 정책상 임의 외부 도메인으로
+## 직접 HTTP 요청을 못 하게 막혀 있어 여기서는 라이브 테스트를 못 했다 — 로직은
+## requests 라이브러리의 정상적인 사용법이고, 단위 테스트는 응답을 모킹해서 검증함.)
+## ────────────────────────────────────────────────────────────────
+
+import re as _re
+import xml.etree.ElementTree as _ET
+
+import requests
+
+REQUEST_TIMEOUT = 10
+_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; AdSenseReadinessChecker/1.0)"}
+
+
+def _safe_get(url: str):
+    """requests.get을 감싸서 (성공여부, 응답객체 또는 에러문자열) 튜플로 반환한다.
+    네트워크 오류를 조용히 삼키지 않는다 — 호출부가 반드시 확인해야 한다."""
+    try:
+        return True, requests.get(url, timeout=REQUEST_TIMEOUT, headers=_HEADERS)
+    except requests.RequestException as e:
+        return False, str(e)
+
+
+def check_https(domain: str) -> dict:
+    ok, resp = _safe_get(f"https://{domain}")
+    if not ok:
+        return {"passed": False, "detail": f"HTTPS 접속 실패: {resp}"}
+    return {"passed": resp.status_code < 400, "detail": f"HTTP {resp.status_code}"}
+
+
+def check_ads_txt(domain: str, expected_publisher_id: str | None = None) -> dict:
+    """expected_publisher_id 예: 'pub-1909539956838332'. 안 넘기면 인증기관ID만 확인한다."""
+
+    ok, resp = _safe_get(f"https://{domain}/ads.txt")
+    if not ok:
+        return {"passed": None, "detail": f"조회 실패(네트워크 오류): {resp}"}
+    if resp.status_code == 404:
+        return {"passed": False, "detail": "ads.txt 파일이 존재하지 않음"}
+    if resp.status_code >= 400:
+        return {"passed": None, "detail": f"확인 불가 (HTTP {resp.status_code})"}
+
+    text = resp.text
+    problems = []
+    if "google.com" not in text:
+        problems.append("google.com 판매자 항목이 없음")
+    if ADSENSE_CERTIFICATION_AUTHORITY_ID not in text:
+        problems.append(f"인증기관ID({ADSENSE_CERTIFICATION_AUTHORITY_ID})가 없음 — 오타 가능성 있음")
+    if expected_publisher_id and expected_publisher_id not in text:
+        problems.append(f"지정한 퍼블리셔ID({expected_publisher_id})가 파일에 없음")
+
+    return {
+        "passed": not problems,
+        "detail": "; ".join(problems) if problems else "정상",
+        "raw": text[:500],
+    }
+
+
+def check_robots_txt(domain: str) -> dict:
+    """Googlebot·Mediapartners-Google(애드센스 크롤러)이 차단돼 있지 않은지 확인한다."""
+
+    ok, resp = _safe_get(f"https://{domain}/robots.txt")
+    if not ok:
+        return {"passed": None, "detail": f"조회 실패(네트워크 오류): {resp}"}
+    if resp.status_code >= 400:
+        # robots.txt가 아예 없으면 관례상 "전부 허용"으로 취급되지만, 확신할 수 없어 unknown 처리
+        return {"passed": None, "detail": f"robots.txt 없음/접근 불가 (HTTP {resp.status_code})"}
+
+    text = resp.text
+    blocked_agents = []
+    for agent in ["Mediapartners-Google", "Googlebot"]:
+        block = _re.search(rf"User-agent:\s*{agent}\b(.*?)(?=\nUser-agent:|\Z)", text, _re.IGNORECASE | _re.DOTALL)
+        if block and _re.search(r"^\s*Disallow:\s*/\s*$", block.group(1), _re.MULTILINE):
+            blocked_agents.append(agent)
+
+    if blocked_agents:
+        return {"passed": False, "detail": f"차단된 크롤러: {', '.join(blocked_agents)}"}
+    return {"passed": True, "detail": "Googlebot·Mediapartners-Google 차단 없음"}
+
+
+def check_sitemap(domain: str, min_urls: int = 15) -> dict:
+    """sitemap.xml의 URL 개수를 센다 — 콘텐츠 "양"의 대략적 지표(질은 별도 확인 필요)."""
+
+    ok, resp = _safe_get(f"https://{domain}/sitemap.xml")
+    if not ok:
+        return {"passed": None, "url_count": None, "detail": f"조회 실패(네트워크 오류): {resp}"}
+    if resp.status_code >= 400:
+        return {"passed": None, "url_count": None, "detail": f"sitemap.xml 없음/접근 불가 (HTTP {resp.status_code})"}
+
+    try:
+        root = _ET.fromstring(resp.content)
+    except _ET.ParseError:
+        return {"passed": None, "url_count": None, "detail": "sitemap.xml 파싱 실패(형식 오류)"}
+
+    count = len([el for el in root.iter() if el.tag.endswith("loc")])
+    return {
+        "passed": count >= min_urls,
+        "url_count": count,
+        "detail": f"URL {count}개 발견 (권장 {min_urls}개 이상) — 개수일 뿐 글자 수·품질은 별도 확인 필요",
+    }
+
+
+def check_essential_pages(domain: str) -> dict:
+    """홈페이지 HTML에서 소개/개인정보처리방침/연락처로 보이는 링크·문구를 찾는다.
+    오탐 가능성이 있는 휴리스틱이다 — "찾음"이 곧 "품질이 충분함"을 뜻하지 않는다,
+    실제 페이지 내용은 사람이 확인해야 한다."""
+
+    ok, resp = _safe_get(f"https://{domain}")
+    if not ok:
+        return {"passed": None, "detail": f"조회 실패(네트워크 오류): {resp}"}
+    if resp.status_code >= 400:
+        return {"passed": None, "detail": f"홈페이지 접근 불가 (HTTP {resp.status_code})"}
+
+    html = resp.text.lower()
+    found = {
+        "about": any(kw in html for kw in ["소개", "about"]),
+        "privacy": any(kw in html for kw in ["개인정보처리방침", "개인정보", "privacy policy", "privacy"]),
+        "contact": any(kw in html for kw in ["연락처", "문의", "contact"]),
+    }
+    missing = [k for k, v in found.items() if not v]
+    return {
+        "passed": not missing,
+        "found": found,
+        "detail": f"홈페이지에서 못 찾음: {', '.join(missing)} (실제 페이지 존재 여부는 링크를 직접 확인)" if missing else "3종 모두 홈페이지에서 링크/문구 확인됨",
+    }
+
+
+def run_full_diagnostic(domain: str, publisher_id: str | None = None) -> dict:
+    """도메인 하나를 실제로 진단한다. 실행 환경에 인터넷 접근이 있어야 의미가 있다
+    (예: GitHub Actions workflow_dispatch로 실행). 판단 안 되는 항목은 None(확인 불가)로
+    남기고, 자동으로 못 보는 항목(콘텐츠 품질·정책 위반 여부·운영 기간)은
+    manual_review_needed에 목록으로 남긴다 — 승인 여부는 예측·보장하지 않는다."""
+
+    checks = {
+        "https": check_https(domain),
+        "ads_txt": check_ads_txt(domain, publisher_id),
+        "robots_txt": check_robots_txt(domain),
+        "sitemap": check_sitemap(domain),
+        "essential_pages": check_essential_pages(domain),
+    }
+
+    return {
+        "domain": domain,
+        "checks": checks,
+        "passed_count": sum(1 for c in checks.values() if c.get("passed") is True),
+        "failed_count": sum(1 for c in checks.values() if c.get("passed") is False),
+        "unknown_count": sum(1 for c in checks.values() if c.get("passed") is None),
+        "manual_review_needed": [
+            "콘텐츠 양·질(편당 800~1,000자 이상, 15~25편 이상, 독창성) — 자동 판단 불가, 사람이 직접 확인",
+            "정책 위반 콘텐츠(성인·폭력·저작권 침해 등) 여부 — 자동 판단 불가",
+            "사이트 운영 기간(최소 1개월, 이상적으로 3~6개월) — 도메인 등록일/최초 발행일 별도 확인",
+        ],
+        "note": "이 진단은 통과 확률을 높이는 준비 상태만 보여준다 — 최종 승인은 구글이 결정하며 보장할 수 없다",
+    }
+
+
 def audit_adsense_readiness(site_info: dict) -> dict:
     """site_info의 각 필드를 체크리스트와 대조해 준비 상태를 점검한다.
 
@@ -118,7 +277,33 @@ Allow: /
 """
 
 
+def _print_diagnostic_report(result: dict) -> None:
+    print(f"\n=== 애드센스 준비 진단: {result['domain']} ===")
+    for name, check in result["checks"].items():
+        status = check.get("passed")
+        mark = "✅" if status is True else "❌" if status is False else "❓"
+        print(f"{mark} {name}: {check.get('detail')}")
+    print(f"\n통과 {result['passed_count']} / 실패 {result['failed_count']} / 확인불가 {result['unknown_count']}")
+    print("\n사람이 직접 확인해야 하는 항목:")
+    for item in result["manual_review_needed"]:
+        print(f"  - {item}")
+    print(f"\n※ {result['note']}")
+
+
 def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="애드센스 승인 준비 진단")
+    parser.add_argument("--domain", help="진단할 도메인 (예: blog.aistoag.com) — 넘기면 실제 HTTP 진단 실행")
+    parser.add_argument("--publisher-id", help="애드센스 퍼블리셔 ID (예: pub-1909539956838332)")
+    args = parser.parse_args()
+
+    if args.domain:
+        result = run_full_diagnostic(args.domain, publisher_id=args.publisher_id)
+        _print_diagnostic_report(result)
+        return
+
+    # --domain 없이 실행하면 매뉴얼 체크리스트 예시만 보여준다 (데모용)
     example = audit_adsense_readiness({
         "post_count_and_length_ok": True,
         "essential_pages_present": False,
@@ -131,6 +316,7 @@ def main():
     })
     print(example)
     print(generate_ads_txt("pub-1234567890123456"))
+    print("\n실제 사이트를 진단하려면: python3 adsense_readiness_agent.py --domain blog.aistoag.com")
 
 
 if __name__ == "__main__":

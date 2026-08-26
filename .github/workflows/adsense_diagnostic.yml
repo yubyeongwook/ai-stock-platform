@@ -1,0 +1,24 @@
+name: 애드센스 승인 준비 진단 (실제 사이트 검사)
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: '진단할 도메인 (예: blog.aistoag.com, laborcheckai.co.kr)'
+        required: true
+      publisher_id:
+        description: '애드센스 퍼블리셔 ID (예: pub-1909539956838332) — 모르면 비워두기'
+        required: false
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests
+      - name: 실제 사이트 진단 실행
+        run: |
+          python3 adsense_readiness_agent.py --domain "${{ inputs.domain }}" --publisher-id "${{ inputs.publisher_id }}"
