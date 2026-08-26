@@ -106,6 +106,13 @@
 
 ## 세션 로그
 
+### 2026-08-26
+사장님이 "AI GROWTH OS" 최종 아키텍처(12단계 엔진 + 28개 에이전트)를 직접 설계해서 확정 — `docs/ai-growth-os-architecture.md`로 문서화. 이전 `north-star-vision.md`가 "고객 6곳 넘기 전까진 안 짓는다"로 냈던 결론을 사장님이 의식적으로 뒤집은 것 — 새 문서가 우선한다고 명시해둠. "한 번에 다 짓지 말고 Phase 1부터"는 사장님 본인 지시라 그대로 따름.
+
+Phase 1(Company Core / Command Center) 착수 — `company_core.py` 신규 작성. `clients/*.json` 하나를 받아 company_id/business_profile/business_dna/marketing_profile/customer_profile/growth_profile 6개로 정리. 기존 client json 스키마와 100% 하위호환(새 필드는 전부 optional). 테스트 5개 추가, 전체 스위트 89개 통과.
+
+신규 클라이언트 2곳 리서치·등록: 서초김치찌개(효령로 216, 냉삼도 유명·재방문율 높음이 실제 강점, 네이버 플레이스 미등록 사실 확인해 0순위 액션으로 플래그), 해안반점(강동 암사동 중식당, 아직 known_facts 없이 public_references만). 애드센스 준비 점검 상품을 정식 상품화 — `docs/adsense-readiness-product.md`(가격 22만원, 경쟁사 실제 시장조사 반영), 웹제작+월관리비 확장 패키지도 추가. aigoid-blog-bot의 하드코딩 시크릿(WP_PASS·네이버 API) 16개 파일 전부 환경변수로 교체해 머지 완료 — 실제 비밀번호 교체는 사장님 액션 대기 중.
+
 ### 2026-08-25
 위 현황판 전체가 이 세션에서 만들어짐 — 마케팅 대행 전략 수립부터 코드 구현·테스트·CI/CD·실제 LLM 검증까지 1일차 전체 작업.
 
