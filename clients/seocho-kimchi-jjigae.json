@@ -6,6 +6,8 @@
   "keywords": ["서초 김치찌개", "강남 서초 맛집", "서초 냉삼", "서초동 냉동삼겹살"],
   "review_target_phone": null,
   "ga4_property_id": null,
+  "revenue": 55500000,
+  "target_revenue": 70000000,
   "banned_terms": [
     "묵은지를 자체적으로 숙성",
     "국물 베이스를 매일 오전 새로 우려내는",
@@ -30,6 +32,7 @@
       "유튜브 - https://www.youtube.com/watch?v=-5SGTgKs6-o ('줄서서 먹는 김치찌개, 서초동 숨은 맛집 서초김치찌개, 또 먹고싶다', 2023-02-04)",
       "[재확인 필요] '3초 계란말이' 바이럴 영상 + SBS 생방송투데이 '서울 김치찌개 TOP5' 방송 출연 — 사장님 확인으로는 이 업체 것일 가능성 높으나, 원문(유튜브/SBS)은 직접 열람 못 해서 100% 검증은 안 됨. 유튜브 shorts https://www.youtube.com/shorts/jcYLiTxa--g 가 관련 영상으로 추정됨"
     ],
-    "social_channels_found": "업체 공식 채널(자체 운영 유튜브/인스타)은 여전히 확인 안 됨 — 위는 전부 제3자가 올린 콘텐츠"
+    "social_channels_found": "업체 공식 채널(자체 운영 유튜브/인스타)은 여전히 확인 안 됨 — 위는 전부 제3자가 올린 콘텐츠",
+    "revenue_note": "revenue(5,550만원)는 performance_log.jsonl에 기록된 캠페인 시작 전 베이스라인 — 사장님 추정치, 정확한 장부 수치 아님. target_revenue(7,000만원)는 사장님이 2026-08-26에 직접 알려준 목표. 객단가·방문전환율·변동비율은 아직 없어서 Goal Decomposer/What-If/이익환산은 revenue_gap(1,450만원)까지만 계산되고 그 다음 단계는 '데이터 부족'으로 멈춰있음."
   }
 }
