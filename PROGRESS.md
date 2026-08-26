@@ -106,6 +106,11 @@
 
 ## 세션 로그
 
+### 2026-08-26 (계속)
+사장님이 AI Growth OS 실제 기술 구현 설계(Next.js+FastAPI+Postgres+Redis+Vector DB+Connector 6종+Workflow Engine)를 상세하게 제시. 실제로 몇 주짜리 풀스택 작업이고 실 배포 인프라·계정·과금이 필요하다는 점, `north-star-vision.md`가 "고객 6곳 넘기 전까진 실인프라 안 짓는다"고 냈던 결론과 정면 충돌한다는 점을 짚어드림 → 사장님이 "이 저장소에 로컬 DB로 스켈레톤만"으로 범위 확정.
+
+Phase 1을 DB 기반으로 확장: `db.py`(SQLAlchemy, 로컬 SQLite, DATABASE_URL만 바꾸면 나중에 Postgres 전환 가능하게 추상화) + `db_models.py`(Company 테이블, clients/*.json 스키마 그대로 이전) + `api_server.py`(FastAPI, `/companies` CRUD 4개 엔드포인트, company_core.py 재사용) + `import_clients_to_db.py`(기존 클라이언트 8곳 마이그레이션, 반복 실행 안전). 인증·Agent Registry·Workflow Engine·Connector·Redis·배포는 명시적으로 범위 밖으로 남김 — `docs/ai-growth-os-architecture.md` 7절에 정리. 테스트 12개 추가, 전체 96개 통과.
+
 ### 2026-08-26
 사장님이 "AI GROWTH OS" 최종 아키텍처(12단계 엔진 + 28개 에이전트)를 직접 설계해서 확정 — `docs/ai-growth-os-architecture.md`로 문서화. 이전 `north-star-vision.md`가 "고객 6곳 넘기 전까진 안 짓는다"로 냈던 결론을 사장님이 의식적으로 뒤집은 것 — 새 문서가 우선한다고 명시해둠. "한 번에 다 짓지 말고 Phase 1부터"는 사장님 본인 지시라 그대로 따름.
 

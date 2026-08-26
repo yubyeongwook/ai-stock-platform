@@ -3,3 +3,4 @@ __pycache__/
 outbox/
 .env
 status.html
+*.db

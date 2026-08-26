@@ -6,3 +6,6 @@ requests
 python-dotenv
 google-analytics-data
 anthropic
+fastapi
+uvicorn[standard]
+sqlalchemy

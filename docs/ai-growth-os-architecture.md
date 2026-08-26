@@ -88,7 +88,7 @@
 
 | Phase | 내용 | 상태 |
 |---|---|---|
-| 1 | Company Core / Command Center | **착수 (이 커밋)** |
+| 1 | Company Core / Command Center | 진행 중 — `company_core.py`(로직) + `db.py`/`db_models.py`/`api_server.py`(로컬 DB·API 스켈레톤) 구현됨 |
 | 2 | Industry Router | 기초 구현 존재, 고도화 예정 |
 | 3 | AI Agent Manager | 미착수 |
 | 4 | Business Intelligence + Customer Intelligence | 미착수 |
@@ -102,3 +102,34 @@
 | 12 | AI Optimization / Autonomous Growth Loop | 미착수 |
 
 **중요**: 12개의 독립 프로그램이 아니라 **하나의 OS 안에 12개 엔진이 연결되는 구조**다 — 새 Phase를 지을 때마다 이 문서의 매핑 표(3절)를 먼저 갱신해서 중복 구현을 피한다.
+
+## 7. 실제 기술 구현 범위 — 2026-08-26 확정
+
+사장님이 Next.js + FastAPI + PostgreSQL + Redis + Vector DB + Connector 6종 + Workflow Engine까지 포함한 전체 기술 스택을 상세 설계했다(원안 그대로 아래 보존). 다만 실행 범위는 사장님이 직접 확인해준 대로 **"이 저장소 안에 로컬 DB로 스켈레톤만"**으로 좁혀서 지금 착수한다 — 실제 배포 인프라(Postgres 호스팅, Redis, 도메인, 계정·과금)는 짓지 않는다.
+
+**지금 구현된 것:**
+- `db.py` — SQLAlchemy 엔진/세션. 기본값은 로컬 SQLite(`growth_os.db`, 이 저장소 안에서만 존재, git에는 안 올라감). `DATABASE_URL` 환경변수만 바꾸면 나중에 Postgres로 전환 가능하게 추상화는 해뒀지만, 지금 실제로 Postgres에 연결하지는 않는다
+- `db_models.py` — Company Core를 담는 `companies` 테이블. `clients/*.json` 스키마를 그대로 컬럼으로 옮긴 것
+- `api_server.py` — FastAPI 앱. `/companies` CRUD 4개 엔드포인트, `company_core.build_company_profile()`을 그대로 재사용. `uvicorn api_server:app`으로 로컬에서만 띄운다 — 배포 안 함
+- `import_clients_to_db.py` — 기존 `clients/*.json` 8개를 DB로 옮기는 마이그레이션 스크립트 (slug 기준 upsert, 반복 실행 안전)
+- 테스트 12개 추가(company_core 5개 + api_server 7개), 전체 스위트 96개 통과
+
+**아직 안 만든 것 (정직하게 밝힘):**
+- Next.js 프론트엔드, Command Center UI — 없음
+- 인증/권한 시스템 — 없음
+- Agent Registry (DB 테이블로 Agent 목록 관리) — 없음
+- Workflow Engine (COMPANY_CREATED → ... → DASHBOARD_READY 같은 이벤트 체인) — 없음
+- Redis/Queue, Vector DB, Object Storage — 없음
+- Connector Layer(Naver/Google/Meta/Website/CRM/예약) — 없음, `integrations/`의 카카오·메타·GA4 개별 연동이 사실상의 초기 버전
+- 실제 배포(Vercel/Render/Supabase 등 새 계정·과금) — 없음
+
+**다음 착수 순서 제안** (사장님 원안의 Phase 2~3에 해당): Industry Router를 DB의 `industry_profiles` 테이블로 정식화하고, `business_dna.py`의 3개 하드코딩 프로필을 거기서 읽어오게 바꾸는 것 — 이게 "업종 추가할 때마다 코드 안 고치고 DB에 행만 추가" 원칙을 실제로 만족시키는 첫 단계다.
+
+### 참고 — 사장님 원안 전체 (기술 스택·Agent 인터페이스·Event 기반 설계·최종 화면 목업 등)
+
+원안 전문은 이 리포지토리의 대화 이력에 있다 — 여기 다시 옮겨적지 않고, 실제 구현이 각 Phase에 도달할 때마다 이 섹션에 해당 부분을 발췌해 반영하는 방식으로 관리한다(문서가 너무 길어지는 것을 피하기 위함). 핵심 원칙 5가지만 여기 남겨둔다:
+1. Agent마다 별도 프로그램을 만들지 않는다 — Agent + Industry Profile + Business DNA + Goal = 업체별 행동 (Config 조합)
+2. Agent Output은 항상 구조화된 형식(status/confidence/findings/recommendations/risk_level/requires_approval)으로 표준화한다
+3. Agent끼리 직접 호출하지 않는다 — 전부 Workflow Engine/Orchestrator를 거친다
+4. 공통 Engine 80% + 업종별 Profile/Rule/Template 20%를 목표로 한다
+5. 가장 중요한 5개: Business DNA, Industry Router, Agent Orchestrator, Revenue/KPI Engine, Optimization Loop
