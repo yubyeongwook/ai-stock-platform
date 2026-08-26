@@ -38,6 +38,9 @@ class Company(Base):
 
     revenue: Mapped[float | None] = mapped_column(Float, nullable=True)
     target_revenue: Mapped[float | None] = mapped_column(Float, nullable=True)
+    funnel_rates: Mapped[dict] = mapped_column(JSON, default=dict)
+    variable_cost_rate: Mapped[float | None] = mapped_column(Float, nullable=True)
+    freedom_level: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     banned_terms: Mapped[list] = mapped_column(JSON, default=list)
     known_facts: Mapped[list] = mapped_column(JSON, default=list)
@@ -71,6 +74,9 @@ class Company(Base):
             "customer_stage": self.customer_stage,
             "revenue": self.revenue,
             "target_revenue": self.target_revenue,
+            "funnel_rates": self.funnel_rates or {},
+            "variable_cost_rate": self.variable_cost_rate,
+            "freedom_level": self.freedom_level,
             "banned_terms": self.banned_terms or [],
             "known_facts": self.known_facts or [],
         }

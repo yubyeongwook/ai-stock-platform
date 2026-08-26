@@ -141,6 +141,36 @@ def what_if(vertical: str, revenue_gap: float, known_rates: dict, delta_pct: flo
     }
 
 
+def estimate_profit_impact(revenue_gap: float, variable_cost_rate: float | None) -> dict:
+    """매출 목표를 이익 기준으로 환산한다 (V5.0/X "Digital CFO"의 정직한 최소 버전).
+
+    "매출을 얼마 늘려야 하는가"만 보면 안 되는 이유: 매출이 늘어도 원가가 그만큼
+    같이 늘면 실제로 남는 돈(기여이익)은 훨씬 적을 수 있다. variable_cost_rate
+    (매출 대비 변동비 비율, 0~1)를 업체가 실제로 알려준 경우에만 계산한다 —
+    모르면서 "보통 이 정도"로 채우면 이익을 지어내는 것과 같다.
+
+    고정비는 반영하지 않는다 — 그건 매출 증가분과 무관하게 이미 나가는 돈이라
+    "이 매출 증가로 실제 남는 돈"을 보는 이 계산의 범위 밖이다.
+    """
+
+    if variable_cost_rate is None:
+        return {
+            "status": "데이터 부족",
+            "detail": "variable_cost_rate(매출 대비 변동비 비율)를 알려주셔야 이익 기준으로 환산할 수 있습니다 — 매출 목표만으로는 실제로 남는 돈을 알 수 없습니다",
+        }
+    if not (0 <= variable_cost_rate <= 1):
+        return {"status": "입력 오류", "detail": "variable_cost_rate는 0~1 사이 비율이어야 합니다"}
+
+    contribution_margin_gap = revenue_gap * (1 - variable_cost_rate)
+    return {
+        "status": "계산 완료",
+        "revenue_gap": revenue_gap,
+        "variable_cost_rate": variable_cost_rate,
+        "contribution_margin_gap": round(contribution_margin_gap),
+        "note": "고정비 제외 — 매출 증가분 중 변동비 빼고 실제로 남는 금액(기여이익)만 계산한 것. 매출을 늘려도 이익이 그만큼 안 늘 수 있다는 걸 보여주는 최소 버전, LTV/CAC 등은 행동 이력이 있어야 해서 여기 없음",
+    }
+
+
 def main():
     example = decompose_goal(
         "restaurant",

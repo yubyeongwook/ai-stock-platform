@@ -1,4 +1,4 @@
-# AI GROWTH OS — 장기 비전 (V3.0 + V5.0, 지금 안 지음, 사장님 설계, 2026-08-26)
+# AI GROWTH OS — 장기 비전 (V3.0 + V5.0 + X, 지금 안 지음, 사장님 설계, 2026-08-26)
 
 **이 문서는 북극성이다. Phase로 안 잡혀있고, 지금 착수 대상이 아니다.** `docs/ai-growth-os-architecture.md`(현재 실제로 짓고 있는 12단계 구조)와 이 문서를 혼동하지 말 것 — 그쪽이 "지금 순서대로 짓는 것", 이 문서는 "데이터·규모가 쌓였을 때 참고할 최종형".
 
@@ -35,3 +35,17 @@
 ## V5.0 원문도 여기 같은 방식으로 보존
 
 사장님이 이어서 제시한 "AI GROWTH OS V5.0"(43절, Business Digital Twin 고도화·Growth Constraint Engine·Counterfactual Engine·Growth Portfolio Engine·Strategic Kill Engine·AI Board 반박 구조·Prediction Accuracy·Agent Reputation·Knowledge Graph+RAG·Truth Layer·Business Stress Test·Early Warning System·Opportunity Radar·AI Growth Autopilot 등) 원문도 V3와 같은 원칙으로 관리한다 — 세션 대화 이력에 원문이 남아있고, 여기 다시 옮겨적지 않는다. V3와 마찬가지로 "정교함"과 "지금 지을 수 있음"의 격차가 더 벌어졌다는 게 검토 결론 — 대부분 다개월치 행동·실험 데이터가 필요하다.
+
+## X ("Autonomous Business Growth Intelligence Platform") — 마지막 버전, 사장님이 직접 "마지막"이라 명명
+
+10개 층 구조(HUMAN COMMAND / AUTOPILOT / LEARNING / EXECUTION / STRATEGY / REVENUE / INTELLIGENCE / DIGITAL TWIN / AGENT·SKILL / DATA·EVENT), Growth Strategy Competition(전략 후보 수십 개 경쟁), Growth Capital Allocation Engine, Strategy Tree/Genome, Industry Pattern Intelligence, AI Freedom Level(0~5), Self-Improvement Engine, Digital CFO, Business Survival/Scale Mode, "8가지 최종 고도화 기준" 등 20절. 원문은 세션 대화 이력 참고, 여기 다시 옮겨적지 않음.
+
+**이번에도 같은 필터 결과**: 대부분(Strategy Competition의 성공확률·예상이익 추정, Strategy Tree/Genome, Industry Pattern Intelligence, Self-Improvement Engine)은 실행 이력·확률 데이터가 있어야 정직함. Self-Improvement Engine(AI가 자기 코드를 수정)은 데이터 문제를 떠나 **안전 설계(샌드박스·테스트·보안·승인 파이프라인) 자체가 이 프로젝트 규모에서 감당하기 어려운 별도 프로젝트급 작업**이라 데이터가 쌓여도 신중하게 접근해야 함 — 우선순위 최하위로 남겨둠.
+
+**이번에 가져온 것 2개** (순수 로직/설정, 데이터 불필요):
+- **AI Freedom Level 0~5** (X 10·11절) — ✅ 완료 (`business_dna.py`의 `FREEDOM_LEVELS`, `default_freedom_level`, `build_business_dna()`의 `explicit_freedom_level` 파라미터). 새 개념이 아니라 이미 있던 3단계 게이트(🟢자동/🟡승인/🔴사람)를 업종별 기본값 + 클라이언트별 override가 가능한 숫자로 명시화한 것. `vertical_active=False`인 업종은 freedom_level을 무조건 0으로 강제(모순 방지)
+- **Digital CFO의 최소 버전** (X 13·14절) — ✅ 완료 (`revenue_engine.estimate_profit_impact()`). "매출 목표"를 "실제 남는 돈(기여이익)" 기준으로 환산. `variable_cost_rate`(매출 대비 변동비 비율)를 업체가 실제로 알려준 경우에만 계산, 없으면 "데이터 부족". CAC/LTV/현금흐름은 행동·거래 이력이 필요해서 여기 포함 안 함 — 원가율만 아는 선에서 할 수 있는 딱 그만큼만
+
+## 패턴 정리 (V3 → V5 → X)
+
+버전이 올라갈수록 "정교함"과 "지금 지을 수 있음"의 격차가 계속 벌어졌다 — 매번 채택된 건 1~2개뿐이었다. 사장님이 X를 "마지막"이라 명명했으므로, 다음 단계는 새 버전 설계가 아니라 **지금까지 가져온 조각들(Goal Decomposer, What-If, Portfolio 태깅, Freedom Level, Digital CFO)을 실제 클라이언트(서초김치찌개·해안반점)에 적용해 검증**하는 것으로 넘어간다.

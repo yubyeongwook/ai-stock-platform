@@ -88,3 +88,31 @@ def test_summary_endpoint_returns_readable_text(client):
     resp = client.get("/companies/summary-test/summary")
     assert resp.status_code == 200
     assert "업체" in resp.json()["summary"]
+
+
+def test_freedom_level_and_profit_impact_flow_through_api(client):
+    resp = client.post(
+        "/companies",
+        json={
+            "slug": "x-demo",
+            "business_name": "X데모식당",
+            "category": "고깃집",
+            "revenue": 10_000_000,
+            "target_revenue": 20_000_000,
+            "variable_cost_rate": 0.5,
+            "freedom_level": 2,
+        },
+    )
+    assert resp.status_code == 201
+    body = resp.json()
+    assert body["business_dna"]["freedom_level"] == 2
+    assert body["growth_profile"]["profit_impact"]["contribution_margin_gap"] == 5_000_000
+
+
+def test_invalid_freedom_level_returns_400_not_500(client):
+    resp = client.post(
+        "/companies", json={"slug": "x-bad", "business_name": "배드", "category": "고깃집", "freedom_level": 9}
+    )
+    assert resp.status_code == 400
+    # 실패한 생성 시도가 DB에 남아있으면 안 됨(재시도 시 슬러그 충돌)
+    assert client.get("/companies/x-bad").status_code == 404

@@ -50,6 +50,9 @@ class CompanyIn(BaseModel):
     customer_stage: str | None = None
     revenue: float | None = None
     target_revenue: float | None = None
+    funnel_rates: dict[str, float] = {}
+    variable_cost_rate: float | None = None
+    freedom_level: int | None = None
     banned_terms: list[str] = []
     known_facts: list[str] = []
 
@@ -62,7 +65,12 @@ def create_company(payload: CompanyIn, db: Session = Depends(get_db)):
     company = Company(**payload.model_dump())
     db.add(company)
     db.commit()
-    return build_company_profile(company.to_client_dict())
+    try:
+        return build_company_profile(company.to_client_dict())
+    except ValueError as e:
+        db.delete(company)
+        db.commit()
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @app.get("/companies")
@@ -97,6 +105,9 @@ class CompanyPatch(BaseModel):
     review_target_phone: str | None = None
     ga4_property_id: str | None = None
     ad_budget: float | None = None
+    funnel_rates: dict[str, float] | None = None
+    variable_cost_rate: float | None = None
+    freedom_level: int | None = None
 
 
 @app.patch("/companies/{slug}")
@@ -108,4 +119,7 @@ def patch_company(slug: str, payload: CompanyPatch, db: Session = Depends(get_db
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(company, field, value)
     db.commit()
-    return build_company_profile(company.to_client_dict())
+    try:
+        return build_company_profile(company.to_client_dict())
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e

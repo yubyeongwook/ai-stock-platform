@@ -52,3 +52,26 @@ def test_explicit_banned_terms_merge_without_duplicating_profile_defaults():
     dna = build_business_dna("예시노무법인", "노무법인", explicit_banned_terms=["고객 연결해드립니다", "새 표현"])
     assert dna["banned_terms"].count("고객 연결해드립니다") == 1
     assert "새 표현" in dna["banned_terms"]
+
+
+def test_restaurant_default_freedom_level():
+    dna = build_business_dna("예시식당", "고깃집")
+    assert dna["freedom_level"] == 3
+    assert dna["freedom_level_label"]
+
+
+def test_inactive_vertical_forces_freedom_level_zero_even_if_overridden():
+    dna = build_business_dna("예시치과", "치과", explicit_freedom_level=5)
+    assert dna["freedom_level"] == 0
+
+
+def test_explicit_freedom_level_overrides_vertical_default():
+    dna = build_business_dna("예시식당", "고깃집", explicit_freedom_level=1)
+    assert dna["freedom_level"] == 1
+
+
+def test_invalid_freedom_level_raises():
+    import pytest
+
+    with pytest.raises(ValueError):
+        build_business_dna("예시식당", "고깃집", explicit_freedom_level=9)

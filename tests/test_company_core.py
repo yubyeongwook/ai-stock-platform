@@ -91,3 +91,35 @@ def test_render_summary_handles_missing_revenue_gracefully():
     profile = build_company_profile(client)
     summary = render_summary(profile)
     assert "매출" not in summary  # revenue/target_revenue 둘 다 없으면 그 줄을 아예 안 보여줌
+
+
+def test_freedom_level_default_flows_through_to_business_dna():
+    client = {"slug": "example-restaurant", "business_name": "예시식당", "category": "고깃집"}
+    profile = build_company_profile(client)
+    assert profile["business_dna"]["freedom_level"] == 3
+
+
+def test_freedom_level_client_override_flows_through():
+    client = {"slug": "example-restaurant", "business_name": "예시식당", "category": "고깃집", "freedom_level": 1}
+    profile = build_company_profile(client)
+    assert profile["business_dna"]["freedom_level"] == 1
+
+
+def test_profit_impact_absent_without_revenue_gap():
+    client = {"slug": "example-restaurant", "business_name": "예시식당", "category": "고깃집"}
+    profile = build_company_profile(client)
+    assert profile["growth_profile"]["profit_impact"] is None
+
+
+def test_profit_impact_computed_when_cost_rate_provided():
+    client = {
+        "slug": "test-biz",
+        "business_name": "테스트업체",
+        "category": "고깃집",
+        "revenue": 10_000_000,
+        "target_revenue": 20_000_000,
+        "variable_cost_rate": 0.5,
+    }
+    profile = build_company_profile(client)
+    assert profile["growth_profile"]["profit_impact"]["status"] == "계산 완료"
+    assert profile["growth_profile"]["profit_impact"]["contribution_margin_gap"] == 5_000_000

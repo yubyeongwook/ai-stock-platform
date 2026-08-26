@@ -123,7 +123,9 @@
 - Connector Layer(Naver/Google/Meta/Website/CRM/예약) — 없음, `integrations/`의 카카오·메타·GA4 개별 연동이 사실상의 초기 버전
 - 실제 배포(Vercel/Render/Supabase 등 새 계정·과금) — 없음
 
-**다음 착수 순서 제안** (사장님 원안의 Phase 2~3에 해당): Industry Router를 DB의 `industry_profiles` 테이블로 정식화하고, `business_dna.py`의 3개 하드코딩 프로필을 거기서 읽어오게 바꾸는 것 — 이게 "업종 추가할 때마다 코드 안 고치고 DB에 행만 추가" 원칙을 실제로 만족시키는 첫 단계다.
+**추가로 반영됨(2026-08-26, `docs/ai-growth-os-future-vision.md`의 V5·X에서 조기 도입)**: `business_dna.py`에 AI Freedom Level(0~5, 업종 기본값+클라이언트 override), `revenue_engine.py`에 `what_if()`(민감도 분석)·`estimate_profit_impact()`(기여이익 환산). `db_models.py`/`api_server.py`도 이 필드들을 갖도록 갱신 완료 — 전체 스택(company_core → DB → API) 관통 확인됨.
+
+**다음 착수 순서 제안** (사장님 원안의 Phase 2~3에 해당): Industry Router를 DB의 `industry_profiles` 테이블로 정식화하고, `business_dna.py`의 3개 하드코딩 프로필을 거기서 읽어오게 바꾸는 것 — 이게 "업종 추가할 때마다 코드 안 고치고 DB에 행만 추가" 원칙을 실제로 만족시키는 첫 단계다. 다만 사장님이 X를 "마지막"으로 명명했으므로, 다음 세션은 새 설계보다 지금까지 만든 조각들의 실제 클라이언트 적용·검증을 우선한다.
 
 ### 참고 — 사장님 원안 전체 (기술 스택·Agent 인터페이스·Event 기반 설계·최종 화면 목업 등)
 

@@ -106,6 +106,15 @@
 
 ## 세션 로그
 
+### 2026-08-26 (계속 5, 사장님이 "마지막"이라 명명)
+사장님이 X("Autonomous Business Growth Intelligence Platform", 10개 층 구조, Growth Strategy Competition, Strategy Tree/Genome, AI Freedom Level, Self-Improvement Engine, Digital CFO 등 20절)를 마지막 버전으로 제시. 같은 필터 적용 — 대부분은 실행 이력·확률 데이터 필요, Self-Improvement Engine(AI 자기 코드 수정)은 데이터 문제를 떠나 안전설계 자체가 별도 프로젝트급이라 최하위 우선순위로 명시.
+
+이번엔 2개 채택: **AI Freedom Level 0~5** — `business_dna.py`에 `FREEDOM_LEVELS`/`default_freedom_level`/`build_business_dna(explicit_freedom_level=...)` 추가. 이미 있던 3단계 승인게이트(🟢🟡🔴)를 업종별 기본값+클라이언트 override 가능한 숫자로 명시화, `vertical_active=False` 업종은 무조건 0 강제(모순 방지). **Digital CFO 최소버전** — `revenue_engine.estimate_profit_impact()`, 매출목표를 기여이익(변동비 제외 실제 남는 돈) 기준으로 환산, `variable_cost_rate` 없으면 계산 거부.
+
+둘 다 `company_core.py`(growth_profile.profit_impact, business_dna.freedom_level) + DB(`db_models.py`에 `funnel_rates`/`variable_cost_rate`/`freedom_level` 컬럼 추가) + API(`api_server.py` CompanyIn/CompanyPatch에 필드 추가, ValueError→400 처리)까지 전체 스택 관통 확인. 이 과정에서 실제 버그 하나 발견·수정: API로 새 필드를 보내도 Pydantic 모델에 없어서 조용히 버려지던 것(profit_impact가 "데이터 부족"으로 계산됨) — DB/API 스키마 갱신 누락은 매번 전체 스택으로 직접 테스트해야 잡힌다는 교훈. 테스트 13개 추가, 전체 125개 통과.
+
+문서에 패턴 정리: V3→V5→X로 오면서 매번 채택된 건 1~2개뿐이었음. 다음은 새 버전 설계가 아니라 지금까지 만든 조각들을 실제 클라이언트에 적용해 검증하는 단계로 넘어가기로 함.
+
 ### 2026-08-26 (계속 4)
 사장님이 V5.0(Business Digital Twin 고도화, Growth Constraint/Counterfactual/Portfolio Engine, AI Executive Board 반박 구조, Agent Reputation, Knowledge Graph+RAG, Truth Layer 등 43절)을 이어서 제시. V3→V5로 오면서 야망은 커지는데 "지금 지을 수 있는 비중"은 더 줄어드는 패턴이라고 짚어드림 — `docs/ai-growth-os-future-vision.md`를 V3+V5 통합 문서로 리네임(`ai-growth-os-v3-vision.md` → `ai-growth-os-future-vision.md`)해서 계속 같은 방식으로 관리.
 

@@ -1,4 +1,4 @@
-from revenue_engine import decompose_goal, what_if
+from revenue_engine import decompose_goal, estimate_profit_impact, what_if
 
 
 def test_unsupported_vertical_returns_clear_status():
@@ -98,3 +98,19 @@ def test_what_if_custom_delta_pct():
         delta_pct=0.2,
     )
     assert all(s["change"] == "+20%" for s in result["scenarios_ranked"])
+
+
+def test_profit_impact_refuses_without_cost_rate():
+    result = estimate_profit_impact(10_000_000, variable_cost_rate=None)
+    assert result["status"] == "데이터 부족"
+
+
+def test_profit_impact_rejects_out_of_range_rate():
+    result = estimate_profit_impact(10_000_000, variable_cost_rate=1.5)
+    assert result["status"] == "입력 오류"
+
+
+def test_profit_impact_computes_contribution_margin():
+    result = estimate_profit_impact(10_000_000, variable_cost_rate=0.4)
+    assert result["status"] == "계산 완료"
+    assert result["contribution_margin_gap"] == 6_000_000
