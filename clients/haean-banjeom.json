@@ -1,0 +1,29 @@
+{
+  "slug": "haean-banjeom",
+  "business_name": "해안반점",
+  "category": "중식당",
+  "location": "강동구 암사동",
+  "keywords": ["암사 중국집", "강동 짬뽕 맛집", "고덕 중식", "우삼겹짬뽕"],
+  "review_target_phone": null,
+  "ga4_property_id": null,
+  "banned_terms": [],
+  "known_facts": [],
+  "public_references": {
+    "note": "전부 웹서치 기반 — 업체(사장님) 확인 전까지는 known_facts로 승격하지 말고 마케팅 카피에도 그대로 쓰지 말 것.",
+    "address": "서울 강동구 고덕로10길 48 (1층, 암사동)",
+    "phone": "0507-1342-6555",
+    "hours": "매일 10:30~22:30",
+    "menu_prices": {
+      "우삼겹짬뽕": "14,000원",
+      "항아리해물짬뽕": "16,000원",
+      "짜장면": "7,500원",
+      "짬뽕": "9,000원",
+      "탕수육": "소 21,000원 / 중 26,000원 / 대 31,000원"
+    },
+    "media_mentions": [
+      "KBS2 '생생정보' 출연 이력 — 흰짜장면(백짜장) 소개 (검색 스니펫 기준, 원문 미확인)"
+    ],
+    "characteristics": "오래된 노포, 해물짬뽕 계열이 강점으로 언급됨, 매장식사+배달 병행",
+    "social_channels_found": "공식 유튜브/인스타/블로그 채널 확인 안 됨"
+  }
+}
