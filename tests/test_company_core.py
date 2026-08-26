@@ -38,6 +38,40 @@ def test_build_company_profile_fills_new_fields_when_present():
     assert profile["growth_profile"]["revenue_gap"] == 20000000
 
 
+def test_goal_decomposition_absent_without_revenue_gap():
+    client = {"slug": "example-restaurant", "business_name": "예시식당", "category": "고깃집"}
+    profile = build_company_profile(client)
+    assert profile["growth_profile"]["goal_decomposition"] is None
+
+
+def test_goal_decomposition_flags_missing_funnel_rates():
+    client = {
+        "slug": "test-biz",
+        "business_name": "테스트업체",
+        "category": "고깃집",
+        "revenue": 10_000_000,
+        "target_revenue": 20_000_000,
+    }
+    profile = build_company_profile(client)
+    decomposition = profile["growth_profile"]["goal_decomposition"]
+    assert decomposition["status"] == "데이터 부족"
+
+
+def test_goal_decomposition_computes_when_funnel_rates_provided():
+    client = {
+        "slug": "test-biz",
+        "business_name": "테스트업체",
+        "category": "고깃집",
+        "revenue": 10_000_000,
+        "target_revenue": 40_000_000,
+        "funnel_rates": {"avg_order_value": 30_000, "visit_conversion_rate": 0.5},
+    }
+    profile = build_company_profile(client)
+    decomposition = profile["growth_profile"]["goal_decomposition"]
+    assert decomposition["status"] == "계산 완료"
+    assert decomposition["required_top_of_funnel"] > 0
+
+
 def test_dental_vertical_stays_blocked_through_company_core():
     client = {"slug": "example-dental", "business_name": "예시치과", "category": "치과"}
     profile = build_company_profile(client)

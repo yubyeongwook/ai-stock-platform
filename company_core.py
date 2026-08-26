@@ -13,6 +13,7 @@ Customer Profile / Growth Profile 여섯 묶음으로 정리한다 — 이후 �
 """
 
 from business_dna import build_business_dna
+from revenue_engine import decompose_goal
 
 
 def build_company_profile(client: dict) -> dict:
@@ -56,11 +57,17 @@ def build_company_profile(client: dict) -> dict:
 
     revenue = client.get("revenue")
     target_revenue = client.get("target_revenue")
+    revenue_gap = (
+        target_revenue - revenue if isinstance(revenue, (int, float)) and isinstance(target_revenue, (int, float)) else None
+    )
     growth_profile = {
         "revenue": revenue,
         "target_revenue": target_revenue,
-        "revenue_gap": (
-            target_revenue - revenue if isinstance(revenue, (int, float)) and isinstance(target_revenue, (int, float)) else None
+        "revenue_gap": revenue_gap,
+        "goal_decomposition": (
+            decompose_goal(dna["vertical"], revenue_gap, client.get("funnel_rates", {}))
+            if revenue_gap is not None
+            else None
         ),
     }
 

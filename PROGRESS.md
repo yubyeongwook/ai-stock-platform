@@ -106,6 +106,11 @@
 
 ## 세션 로그
 
+### 2026-08-26 (계속 3)
+사장님이 V3.0(Digital Twin, Event Mesh, AI Executive Board 토론, Causal/Propensity Engine 등 46절)을 제시. 대부분 실제 행동·매출 데이터가 있어야 정직하게 구현 가능하다고 판단해 `docs/ai-growth-os-v3-vision.md`(북극성, 지금 안 지음)로 보존만 해두고, 그중 데이터 없이도 정직하게 지금 지을 수 있는 2개(Revenue Equation Engine, Goal Decomposer)만 채택.
+
+`revenue_engine.py` 신규: 업종별(restaurant/labor_firm/dental) 매출 방정식을 정의하고, 목표매출과의 격차를 역산. competitor_agent.py와 같은 원칙 — 업체가 실제로 측정한 전환율만 쓰고, 업계 평균으로 빈 값을 채우지 않는다(값 없으면 "데이터 부족"으로 계산 중단). `company_core.py`의 growth_profile에 통합(`funnel_rates` 필드 있으면 자동 계산). 테스트 11개 추가(revenue_engine 8 + company_core 통합 3), 전체 107개 통과. API 서버(`/companies`)를 통해 실제 end-to-end 확인함.
+
 ### 2026-08-26 (계속)
 사장님이 AI Growth OS 실제 기술 구현 설계(Next.js+FastAPI+Postgres+Redis+Vector DB+Connector 6종+Workflow Engine)를 상세하게 제시. 실제로 몇 주짜리 풀스택 작업이고 실 배포 인프라·계정·과금이 필요하다는 점, `north-star-vision.md`가 "고객 6곳 넘기 전까진 실인프라 안 짓는다"고 냈던 결론과 정면 충돌한다는 점을 짚어드림 → 사장님이 "이 저장소에 로컬 DB로 스켈레톤만"으로 범위 확정.
 
