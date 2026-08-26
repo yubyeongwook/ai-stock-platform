@@ -36,6 +36,12 @@
 - **주식 SEO 롱테일 키워드 기능 구현** — `aigoid-blog-bot`에 `add-longtail-keyword-seo` 브랜치로 `longtail_keywords.py` + `longtail.yml` 워크플로 추가. 기존 헤드 키워드(삼성전자·코스피 등, 경쟁 심함) 대신 "삼성전자 목표주가", "8월 26일 코스피 전망" 같은 롱테일 쿼리로 검색 1위 현실적으로 노림. **master에 안 올리고 별도 브랜치 + workflow_dispatch(수동)로만 뒀음** — 기존 자동 스케줄(trending.yml)에 영향 안 주려고, 사장님 검증 후 머지 여부 결정
 - **주식 블로그 "색인 4개" 원인 진단 완료 + 해결 코드 작성**: 로컬 백업(`scratch/all_posts_dump.json`)으로 실제 174개 글이 발행돼 있는 걸 확인, `utils/seo_optimizer.py`의 `ping_search_engines()`가 예전 구글/빙 핑 엔드포인트 폐지로 이미 아무것도 안 하는 no-op이었던 걸 코드 주석에서 발견(이전 작업자가 정직하게 남긴 기록). blogspot.com 서브도메인이라 IndexNow도 못 씀. → `aigoid-blog-bot`에 `add-search-console-sync` 브랜치로 `utils/search_console_sync.py`(Search Console API로 사이트맵 재제출 + 색인 상태 실측 점검, Google의 제한적 Indexing API는 정책 범위 밖이라 안 씀) + `search_console_sync.yml` 워크플로 추가. **서비스 계정 발급·서치콘솔 권한 부여는 사장님이 직접 해야 함**(코드 안 주석에 단계별 안내 포함)
 
+**AI GROWTH OS 아키텍처 갭 채움**
+- 사장님이 그린 두 다이어그램(클라이언트 데이터 모델 ①~⑦, 시스템 루프 AI GROWTH OS) 기준으로 빠진 부분 확인 → 70%는 이미 구현돼 있었고, 진짜 빠진 건 "경쟁분석 Agent"와 "AI 재전략 수립" 두 가지였음
+- **`competitor_agent.py` 신규 추가** — 경쟁사를 지어내지 않는 설계(웹검색 연동이 없어서 LLM이 물으면 환각 위험 있음). `known_competitors`를 사장님이 직접 입력해야 동작, 비어있으면 분석 거부 + 이유 명시
+- **`master_ai.propose_next_action()` 추가** — 병목 진단에서 한 단계 더 나아가 병목 단계별 구체적 액션 후보(`ACTIONS_BY_STAGE` 룩업) 제시, 여전히 사람 승인 필요(레벨 2 게이트 유지)
+- 테스트 7개 추가, 63개 전체 통과
+
 **사장님의 기존 자산 파악 (신규 확인, 아직 이 시스템에 미등록)**
 - `www.aistoag.com` / `aigoid.blogspot.com` — 주식 콘텐츠, **이미 완전 자동화 운영 중** (블로그 + 인스타그램 릴스 + 카드뉴스 + 유튜브까지). 어떤 도구/방식으로 자동화했는지는 아직 파악 안 됨. 네트워크 정책상 이 세션에서 직접 사이트 열람 불가(`EGRESS_BLOCKED`) — 사장님 설명으로만 확인
 - `노무체크ai.com` / `laborcheckai.co.kr` — 사장님 개인 사이트, 위 4번째 클라이언트(`laborcheck-ai`)로 등록한 사업과 동일
@@ -64,6 +70,7 @@
 - 카카오 알림톡 대행사 계약(리뷰·리텐션 기능 활성화용)
 - Phase 1 유료 전환 준비 (파일럿 사례 나오면)
 - K-eduon 클라이언트 등록 — 사장님이 "나중에"로 미룸, 요청 시 진행
+- **클라이언트 스키마 확장** (사장님 다이어그램 ③④⑤⑥⑦: 목표/KPI, 상품, 고객 페르소나, 채널별 광고비·성과) — 아직 `clients/*.json` 구조에 반영 안 됨, 다음 세션 후보
 
 ### ❓ 미정 (아직 결정 안 됨)
 
