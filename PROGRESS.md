@@ -41,6 +41,7 @@
 - **`competitor_agent.py` 신규 추가** — 경쟁사를 지어내지 않는 설계(웹검색 연동이 없어서 LLM이 물으면 환각 위험 있음). `known_competitors`를 사장님이 직접 입력해야 동작, 비어있으면 분석 거부 + 이유 명시
 - **`master_ai.propose_next_action()` 추가** — 병목 진단에서 한 단계 더 나아가 병목 단계별 구체적 액션 후보(`ACTIONS_BY_STAGE` 룩업) 제시, 여전히 사람 승인 필요(레벨 2 게이트 유지)
 - 테스트 7개 추가, 63개 전체 통과
+- **`propose_next_action()`을 `orchestrator.py`에 실제로 연결함** (`--metrics-json` 단계), 기존보다 구체적인 액션 후보가 나옴 — 새 데이터 필요 없어서 바로 적용. `competitor_agent.py`는 아직 안 물림(모든 클라이언트가 known_competitors 비어있어서 지금 넣으면 죽은 단계) — 서초김치찌개 등 실제 경쟁사 정보 채워지면 연결 예정
 
 **사장님의 기존 자산 파악 (신규 확인, 아직 이 시스템에 미등록)**
 - `www.aistoag.com` / `aigoid.blogspot.com` — 주식 콘텐츠, **이미 완전 자동화 운영 중** (블로그 + 인스타그램 릴스 + 카드뉴스 + 유튜브까지). 어떤 도구/방식으로 자동화했는지는 아직 파악 안 됨. 네트워크 정책상 이 세션에서 직접 사이트 열람 불가(`EGRESS_BLOCKED`) — 사장님 설명으로만 확인
