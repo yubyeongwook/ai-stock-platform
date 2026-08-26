@@ -136,6 +136,8 @@ AM/QA/총괄 검수를 별도로 채용하지 않고, 9개 에이전트가 만�
 - `docs/saas-db-schema-draft.sql`: **5단계(SaaS 전환) 스키마 설계 초안** — 실제 Supabase 프로젝트는 아직 프로비저닝 안 함, 착수 시점에 그대로 적용할 수 있게 설계만 해둠
 - `business_dna.py`의 6단계 대비 프로필: 병원 일반·미용실·학원·법무법인/세무법인을 미리 등록해뒀으나 전부 `active: False` — 법 조문 검증 전에는 콘텐츠 생성 자체가 코드로 막힘
 - `docs/quote-template.md`: 2단계(첫 유료 전환) 견적서 템플릿, `service-agreement-template.md`와 짝
-- `.github/workflows/ci.yml`: 푸시할 때마다 테스트 45개 자동 실행
+- `competitor_agent.py`: 경쟁분석 에이전트 — 사장님이 아는 실제 경쟁사 정보(known_competitors) 없이는 분석을 거부한다(환각 방지). AI GROWTH OS 다이어그램의 "경쟁분석 Agent" 갭을 채움
+- `adsense_readiness_agent.py` / `adsense_essential_pages.py`: **애드센스 승인 준비 점검 상품의 코드 기반** — 구글 공식 정책+실제 승인 사례 종합 체크리스트로 준비 상태를 점검하고, ads.txt·소개/개인정보처리방침/연락처 페이지를 생성한다. "승인 보장"은 절대 팔면 안 됨(구글이 직접 심사, 자동화 불가) — "승인 확률을 높이는 준비·점검"까지만 상품화
+- `.github/workflows/ci.yml`: 푸시할 때마다 테스트 자동 실행(현재 72개)
 - `.github/workflows/generate-content.yml`: GitHub Actions 시크릿(`ANTHROPIC_API_KEY` 등, 이름은 `.env.example`과 동일해야 함)으로 `orchestrator.py`를 실제 실행 — 지금은 수동 실행만(비용 발생 가능해서 자동 스케줄은 파일럿 검증 후 추가). 산출물은 워크플로 아티팩트로 다운로드
 - `integrations/`: 카카오 알림톡·메타 광고·GA4·LLM(클로드) 연동 클라이언트. `.env.example` 참고. 카카오·메타·GA4는 계정 발급(본인 명의·사업자 인증 필요, 내가 대신 못 함)이 남아있고, **LLM(`llm_writer.py`)은 `ANTHROPIC_API_KEY`만 넣으면 바로 실제 블로그 본문을 써준다** — API 키 미설정/오류 시에도 죽지 않고 뼈대만 출력하며 이유를 파일에 남긴다(검증 완료)
