@@ -72,6 +72,10 @@
 - Phase 1 유료 전환 준비 (파일럿 사례 나오면)
 - K-eduon 클라이언트 등록 — 사장님이 "나중에"로 미룸, 요청 시 진행
 - **애드센스 승인 준비 상품화** — 구글 공식 정책(support.google.com answer/48182, 9724) + 실제 승인 사례 조사 → `adsense_readiness_agent.py`(체크리스트 점검, ads.txt 생성 — 인증기관ID `f08c47fec0942fa0`은 laborcheck-ai 실제 버그 수정 이력으로 재확인), `adsense_essential_pages.py`(소개/개인정보처리방침/연락처 페이지 생성, known_facts만 사용). **"승인 보장"은 절대 팔면 안 됨**(구글이 직접 심사, 자동화 불가 — 검색 1위 보장과 같은 이유) — "승인 확률 높이는 준비·점검"까지만 상품화. 테스트 9개 추가, 72개 전체 통과
+- **실제 블로그 2곳에 애드센스 체크리스트 적용(감사+수정)**:
+  - **주식 블로그(aigoid-blog-bot)**: 개인정보처리방침 페이지가 아예 없었음("투자 면책고지"는 목적이 달라 대체 안 됨) → `content/static_pages.py`에 `privacy_policy_page_html()` 추가(쿠키·AdSense·GA4 고지 포함) + `scripts/publish_static_pages.py`에 연결(`add-privacy-policy-page` 브랜치, 미머지). ads.txt/robots.txt는 Blogger API에 아예 없는 기능이라 코드로 못 고침 — **사장님이 Blogger 설정 > 크롤러 및 색인생성에서 직접 확인 필요**
+  - **노무체크AI(laborcheck-ai)**: ads.txt/robots.txt는 이미 정상(퍼블리셔ID+인증기관ID `f08c47fec0942fa0` 정확, Googlebot·Mediapartners-Google 허용됨). Privacy Policy는 있었지만 광고 쿠키/구글 광고설정 옵트아웃 고지가 없어서 7번 섹션 추가. **소개(About) 페이지가 아예 없어서** 신규 생성(`About.jsx`) + 라우팅·푸터 연결 (`add-about-page-and-adsense-privacy-clause` 브랜치, 미머지)
+  - 둘 다 검증된 사실(known_facts)만 사용, 지어낸 내용 없음
 - **클라이언트 스키마 확장** (사장님 다이어그램 ③④⑤⑥⑦: 목표/KPI, 상품, 고객 페르소나, 채널별 광고비·성과) — 아직 `clients/*.json` 구조에 반영 안 됨, 다음 세션 후보
 
 ### ❓ 미정 (아직 결정 안 됨)
