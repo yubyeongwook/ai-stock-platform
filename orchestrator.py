@@ -141,11 +141,12 @@ def fetch_weekly_performance(client: dict) -> dict:
 
 
 def diagnose_client_priority(client: dict, metrics: dict) -> dict:
-    """Master AI(master_ai.py)에게 이번 주기 우선순위를 물어본다. 실행은 안 하고 추천만 반환한다."""
+    """Master AI(master_ai.py)에게 이번 주기 우선순위 + 구체적 액션 후보를 물어본다.
+    실행은 안 하고 추천만 반환한다(레벨 2 게이트)."""
 
-    from master_ai import next_cycle_priority
+    from master_ai import propose_next_action
 
-    return next_cycle_priority(client["business_name"], metrics)
+    return propose_next_action(client["business_name"], metrics)
 
 
 def main():

@@ -68,6 +68,7 @@ def test_send_review_reminder_skips_without_phone(restaurant_client):
 def test_diagnose_client_priority_wraps_master_ai(restaurant_client):
     result = diagnose_client_priority(restaurant_client, {"impressions": 100})
     assert result["client"] == restaurant_client["business_name"]
+    assert "candidate_actions" in result
 
 
 def test_load_client_reads_json_file(tmp_path, restaurant_client):
