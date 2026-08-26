@@ -1,4 +1,4 @@
-from revenue_engine import decompose_goal
+from revenue_engine import decompose_goal, what_if
 
 
 def test_unsupported_vertical_returns_clear_status():
@@ -70,3 +70,31 @@ def test_dental_four_stage_chain_all_present():
     )
     assert result["status"] == "계산 완료"
     assert result["required_top_of_funnel"] > 0
+
+
+def test_what_if_refuses_without_baseline_data():
+    result = what_if("restaurant", 10_000_000, known_rates={})
+    assert result["status"] == "데이터 부족"
+
+
+def test_what_if_ranks_scenarios_and_shows_reduction():
+    result = what_if(
+        "restaurant",
+        30_000_000,
+        known_rates={"avg_order_value": 30_000, "visit_conversion_rate": 0.5},
+    )
+    assert result["status"] == "계산 완료"
+    assert len(result["scenarios_ranked"]) == 2
+    for scenario in result["scenarios_ranked"]:
+        assert scenario["required_top_of_funnel_after"] < scenario["required_top_of_funnel_before"]
+        assert scenario["reduction_pct"] > 0
+
+
+def test_what_if_custom_delta_pct():
+    result = what_if(
+        "restaurant",
+        30_000_000,
+        known_rates={"avg_order_value": 30_000, "visit_conversion_rate": 0.5},
+        delta_pct=0.2,
+    )
+    assert all(s["change"] == "+20%" for s in result["scenarios_ranked"])

@@ -92,7 +92,7 @@
 | 2 | Industry Router | 기초 구현 존재, 고도화 예정 |
 | 3 | AI Agent Manager | 미착수 |
 | 4 | Business Intelligence + Customer Intelligence | 미착수 |
-| 5 | Growth Strategy Engine | 기초 구현 존재(`master_ai.py`) + Revenue Equation Engine/Goal Decomposer(`revenue_engine.py`, `docs/ai-growth-os-v3-vision.md`에서 조기 도입) |
+| 5 | Growth Strategy Engine | 기초 구현 존재(`master_ai.py`) + Revenue Equation Engine/Goal Decomposer(`revenue_engine.py`, `docs/ai-growth-os-future-vision.md`에서 조기 도입) |
 | 6 | SEO + Content Engine | 부분 구현 존재 |
 | 7 | Advertising + Campaign Engine | 부분 구현 존재 |
 | 8 | Conversion + Landing Page Engine | 미착수 |

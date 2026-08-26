@@ -80,6 +80,24 @@ ACTIONS_BY_STAGE = {
     ],
 }
 
+# Growth Portfolio 태깅(V5.0 "Growth Portfolio Engine"의 정직한 최소 버전) — 데이터로 계산한 게
+# 아니라, 액션의 성격(기존 자산 재사용 vs 강도 조정 vs 새 시도)에 따른 사람의 편집적 분류다.
+# 안전 = 이미 검증된 채널/자산을 그대로 쓰는 것, 실패해도 손실이 거의 없음
+# 핵심 = 지금 하는 활동의 강도·배치를 조정하는 것
+# 실험 = 새 채널/포맷을 시도하는 것, 결과가 불확실함
+ACTION_PORTFOLIO_TIER = {
+    "블로그 발행 빈도를 늘린다 (주 X회 -> Y회)": "핵심",
+    "롱테일 키워드(경쟁 적은 구체적 검색어)로 신규 글 추가": "핵심",
+    "인스타그램/카드뉴스 배포 채널 추가": "실험",
+    "제목(헤드라인) 포맷을 4U 공식 중 다른 유형으로 교체해 A/B 비교": "실험",
+    "썸네일/대표 이미지 교체": "핵심",
+    "CTA 문구를 명확한 행동 지시형으로 교체": "핵심",
+    "랜딩 페이지 첫 화면에 핵심 혜택 재배치": "핵심",
+    "리뷰·후기 섹션 강화(있는 그대로의 실제 후기만)": "안전",
+    "카카오 알림톡 리마인드 발송 주기 점검": "안전",
+    "재방문 유도 혜택(실제 존재하는 것만) 콘텐츠에 명시": "안전",
+}
+
 
 def propose_next_action(client_name: str, metrics: dict) -> dict:
     """병목 진단에 더해 "이번 주기에 뭘 해볼지" 후보까지 제안한다. next_cycle_priority()보다
@@ -90,11 +108,15 @@ def propose_next_action(client_name: str, metrics: dict) -> dict:
     diagnosis = diagnose_bottleneck(metrics)
     stage = diagnosis.get("bottleneck")
     candidate_actions = ACTIONS_BY_STAGE.get(stage, [])
+    candidate_actions_tagged = [
+        {"action": a, "portfolio_tier": ACTION_PORTFOLIO_TIER.get(a, "미분류")} for a in candidate_actions
+    ]
 
     return {
         "client": client_name,
         "diagnosis": diagnosis,
         "candidate_actions": candidate_actions,
+        "candidate_actions_tagged": candidate_actions_tagged,
         "status": "사람 승인 대기 (자동 실행 아님) — 후보 중 하나를 사람이 선택해야 함",
     }
 

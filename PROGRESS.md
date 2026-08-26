@@ -106,8 +106,13 @@
 
 ## 세션 로그
 
+### 2026-08-26 (계속 4)
+사장님이 V5.0(Business Digital Twin 고도화, Growth Constraint/Counterfactual/Portfolio Engine, AI Executive Board 반박 구조, Agent Reputation, Knowledge Graph+RAG, Truth Layer 등 43절)을 이어서 제시. V3→V5로 오면서 야망은 커지는데 "지금 지을 수 있는 비중"은 더 줄어드는 패턴이라고 짚어드림 — `docs/ai-growth-os-future-vision.md`를 V3+V5 통합 문서로 리네임(`ai-growth-os-v3-vision.md` → `ai-growth-os-future-vision.md`)해서 계속 같은 방식으로 관리.
+
+이번에도 순수 로직인 2개만 채택: `revenue_engine.what_if()`(V5 8·35·36절 Counterfactual Engine — 각 전환율 지표를 10%씩 개선했을 때 필요 유입이 얼마나 줄어드는지 랭킹, 실행난이도·비용은 반영 안 한다고 명시) + `master_ai.ACTION_PORTFOLIO_TIER`(V5 9절 Growth Portfolio — 기존 액션 후보에 안전/핵심/실험 태그, 데이터 계산 아니라 편집적 분류라고 명시). 테스트 5개 추가, 전체 112개 통과.
+
 ### 2026-08-26 (계속 3)
-사장님이 V3.0(Digital Twin, Event Mesh, AI Executive Board 토론, Causal/Propensity Engine 등 46절)을 제시. 대부분 실제 행동·매출 데이터가 있어야 정직하게 구현 가능하다고 판단해 `docs/ai-growth-os-v3-vision.md`(북극성, 지금 안 지음)로 보존만 해두고, 그중 데이터 없이도 정직하게 지금 지을 수 있는 2개(Revenue Equation Engine, Goal Decomposer)만 채택.
+사장님이 V3.0(Digital Twin, Event Mesh, AI Executive Board 토론, Causal/Propensity Engine 등 46절)을 제시. 대부분 실제 행동·매출 데이터가 있어야 정직하게 구현 가능하다고 판단해 `docs/ai-growth-os-future-vision.md`(북극성, 지금 안 지음)로 보존만 해두고, 그중 데이터 없이도 정직하게 지금 지을 수 있는 2개(Revenue Equation Engine, Goal Decomposer)만 채택.
 
 `revenue_engine.py` 신규: 업종별(restaurant/labor_firm/dental) 매출 방정식을 정의하고, 목표매출과의 격차를 역산. competitor_agent.py와 같은 원칙 — 업체가 실제로 측정한 전환율만 쓰고, 업계 평균으로 빈 값을 채우지 않는다(값 없으면 "데이터 부족"으로 계산 중단). `company_core.py`의 growth_profile에 통합(`funnel_rates` 필드 있으면 자동 계산). 테스트 11개 추가(revenue_engine 8 + company_core 통합 3), 전체 107개 통과. API 서버(`/companies`)를 통해 실제 end-to-end 확인함.
 

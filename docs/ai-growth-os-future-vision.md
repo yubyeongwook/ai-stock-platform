@@ -1,4 +1,4 @@
-# AI GROWTH OS V3.0 — 장기 비전 (지금 안 지음, 사장님 설계, 2026-08-26)
+# AI GROWTH OS — 장기 비전 (V3.0 + V5.0, 지금 안 지음, 사장님 설계, 2026-08-26)
 
 **이 문서는 북극성이다. Phase로 안 잡혀있고, 지금 착수 대상이 아니다.** `docs/ai-growth-os-architecture.md`(현재 실제로 짓고 있는 12단계 구조)와 이 문서를 혼동하지 말 것 — 그쪽이 "지금 순서대로 짓는 것", 이 문서는 "데이터·규모가 쌓였을 때 참고할 최종형".
 
@@ -25,7 +25,13 @@
 ## 착수 순서 후보 (데이터가 쌓이면, 우선순위 순)
 
 1. Revenue Equation Engine + Goal Decomposer — ✅ 완료 (`revenue_engine.py`)
-2. Growth Bottleneck Detection 고도화(Volume/Conversion/Revenue/Margin/Retention 동시 판단) — `master_ai.py` 확장, 실측 지표 여러 개 있으면 가능
-3. Margin Intelligence — 원가·광고비 데이터가 client 브리프에 들어오면 가능
-4. Decision Ledger — 이건 데이터가 없어도 가능(그냥 의사결정 기록 테이블), 다만 지금은 의사결정 자체가 적어 가치가 낮음. Phase 3(Agent Manager) 이후 자연스럽게 필요해지면 추가
-5. 그 외 전부 — 고객 6곳+ 실행 데이터 쌓인 뒤 재검토
+2. What-If / Counterfactual Engine(V5.0 8·35·36절의 정직한 버전) — ✅ 완료 (`revenue_engine.what_if()`). 순수 산수(민감도 분석)라 데이터 없이도 정직함 — 실행 난이도·비용은 반영 안 한다고 명시
+3. Growth Portfolio 태깅(V5.0 9절) — ✅ 완료 (`master_ai.ACTION_PORTFOLIO_TIER`). 데이터 계산이 아니라 액션 성격에 따른 사람의 편집적 분류라고 명시
+4. Growth Bottleneck Detection 고도화(Volume/Conversion/Revenue/Margin/Retention 동시 판단) — `master_ai.py` 확장, 실측 지표 여러 개 있으면 가능
+5. Margin Intelligence — 원가·광고비 데이터가 client 브리프에 들어오면 가능
+6. Decision Ledger — 이건 데이터가 없어도 가능(그냥 의사결정 기록 테이블), 다만 지금은 의사결정 자체가 적어 가치가 낮음. Phase 3(Agent Manager) 이후 자연스럽게 필요해지면 추가
+7. 그 외 전부(Digital Twin, Event Mesh, AI Executive Board 토론, Causal/Propensity Engine, Knowledge Graph+RAG, Truth Layer, Agent Reputation System 등 V3·V5의 나머지) — 고객 6곳+ 실행 데이터 쌓인 뒤 재검토
+
+## V5.0 원문도 여기 같은 방식으로 보존
+
+사장님이 이어서 제시한 "AI GROWTH OS V5.0"(43절, Business Digital Twin 고도화·Growth Constraint Engine·Counterfactual Engine·Growth Portfolio Engine·Strategic Kill Engine·AI Board 반박 구조·Prediction Accuracy·Agent Reputation·Knowledge Graph+RAG·Truth Layer·Business Stress Test·Early Warning System·Opportunity Radar·AI Growth Autopilot 등) 원문도 V3와 같은 원칙으로 관리한다 — 세션 대화 이력에 원문이 남아있고, 여기 다시 옮겨적지 않는다. V3와 마찬가지로 "정교함"과 "지금 지을 수 있음"의 격차가 더 벌어졌다는 게 검토 결론 — 대부분 다개월치 행동·실험 데이터가 필요하다.
