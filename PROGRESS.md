@@ -76,6 +76,8 @@
   - **주식 블로그(aigoid-blog-bot)**: 개인정보처리방침 페이지가 아예 없었음("투자 면책고지"는 목적이 달라 대체 안 됨) → `content/static_pages.py`에 `privacy_policy_page_html()` 추가(쿠키·AdSense·GA4 고지 포함) + `scripts/publish_static_pages.py`에 연결(`add-privacy-policy-page` 브랜치, 미머지). ads.txt/robots.txt는 Blogger API에 아예 없는 기능이라 코드로 못 고침 — **사장님이 Blogger 설정 > 크롤러 및 색인생성에서 직접 확인 필요**
   - **노무체크AI(laborcheck-ai)**: ads.txt/robots.txt는 이미 정상(퍼블리셔ID+인증기관ID `f08c47fec0942fa0` 정확, Googlebot·Mediapartners-Google 허용됨). Privacy Policy는 있었지만 광고 쿠키/구글 광고설정 옵트아웃 고지가 없어서 7번 섹션 추가. **소개(About) 페이지가 아예 없어서** 신규 생성(`About.jsx`) + 라우팅·푸터 연결 (`add-about-page-and-adsense-privacy-clause` 브랜치, 미머지)
   - 둘 다 검증된 사실(known_facts)만 사용, 지어낸 내용 없음
+- **애드센스 진단을 "매뉴얼 체크리스트"에서 "실제 HTTP 진단"으로 업그레이드** — 사장님이 "대충 하지 말고 확실히" 지적 → 기존 건 사람이 True/False 입력해야 했던 틀뿐이었음을 인정하고 재작업. `check_https/check_ads_txt/check_robots_txt/check_sitemap/check_essential_pages` + `run_full_diagnostic()` 추가(전부 `requests` 기반 실제 조회). **이 세션 자체는 보안 정책상 임의 외부 도메인 직접 요청이 막혀 있어서(`curl $HTTPS_PROXY/__agentproxy/status`로 "policy denial" 직접 확인) 저는 라이브 테스트를 못 함** — 대신 `.github/workflows/adsense_diagnostic.yml`(workflow_dispatch, domain+publisher_id 입력) 추가해서 실제 인터넷 되는 GitHub Actions에서 버튼 하나로 실행 가능하게 만듦. 테스트는 HTTP 응답 모킹으로 16개 추가(ads.txt 인증기관ID 오타 재현 회귀테스트 포함), 84개 전체 통과
+  - **사장님이 실행하실 것**: 이 브랜치가 main에 머지돼야 Actions 탭에서 실제로 클릭 가능(workflow_dispatch는 기본 브랜치에 있어야 함, PR #1 때 배운 것과 동일한 이유)
 - **클라이언트 스키마 확장** (사장님 다이어그램 ③④⑤⑥⑦: 목표/KPI, 상품, 고객 페르소나, 채널별 광고비·성과) — 아직 `clients/*.json` 구조에 반영 안 됨, 다음 세션 후보
 
 ### ❓ 미정 (아직 결정 안 됨)
